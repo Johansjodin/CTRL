@@ -37,6 +37,19 @@ exports.get_user = function(req, res) {
     });
 };
 
+exports.login = function(req, res) {
+    let query = User.findOne({email: req.body.email});
+
+    query.exec(function (err, user) {
+        if (err) throw err;
+        if (!user) return res.status(401).json("Authentication failed, User not found.").end();
+        if (!user.validPassword(req.body.password)) {
+            return res.status(401).json("Authentication failed, wrong password.").end();
+        }
+        return res.json({token: user.generateToken()});
+    })
+}
+
 exports.create_node = function(req, res) {
     console.log(req.body);
     let node = new NodeSchema({name: req.body.name,

@@ -1,6 +1,8 @@
 require('dotenv').config();
 
-var express = require('express'),
+const bearerToken = require('express-bearer-token');
+
+const express = require('express'),
     app = express(),
     port = process.env.PORT || 8080,
     mongoose = require('mongoose'),
@@ -17,6 +19,7 @@ mongoose.Promise = global.Promise;
 mongoose.connect(process.env.DB_URI,
                  {useNewUrlParser: true});
 
+app.use(bearerToken());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 

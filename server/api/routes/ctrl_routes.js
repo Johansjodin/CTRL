@@ -1,12 +1,18 @@
 'use strict';
 module.exports = function(app) {
-    var ctrl = require('../controllers/CTRLr');
+    const ctrl = require('../controllers/CTRLr');
+    const auth = require('../controllers/auth');
+
+    app.use(auth.validateToken);
 
     app.route('/users')
         .post(ctrl.create_user);
 
     app.route('/users/:userId')
-        .get(ctrl.get_user);
+        .get(auth.loginRequired, ctrl.get_user);
+
+    app.route('/auth/sign_in')
+        .post(ctrl.login);
 
     app.route('/nodes/')
         .get(ctrl.get_nodes)
@@ -20,9 +26,5 @@ module.exports = function(app) {
 
     app.route('/capture')
         .get(ctrl.test_capture);
-/*
-    app.route('/session/')
-        .post(ctrl.auth_user)
-        .delete(ctrl.destroy_session); */
 
 };
