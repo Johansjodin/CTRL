@@ -5,6 +5,7 @@ var express = require('express'),
     port = process.env.PORT || 8080,
     mongoose = require('mongoose'),
     User = require('./api/models/User'),
+    NodeSchema = require('./api/models/Node'),
     bodyParser = require('body-parser');
 
 // mongoose instance connection url connection
