@@ -1,13 +1,21 @@
 import React from 'react';
-import LoginScreen from './views/loginScreen';
+import LoginScreen from './screens/loginScreen';
+import HomeScreen from './screens/homeScreen';
+import { createStackNavigator, createAppContainer } from 'react-navigation';
 
-export default class App extends React.Component {
-	render() {
-		return (
-			<LoginScreen />
-		);
-	}
-}
+const AppNavigator = createStackNavigator(
+    {
+        LoginScreen: {screen: LoginScreen},
+        HomeScreen: {screen: HomeScreen}
+    },
+    {
+        initialRouteName: "LoginScreen",
+        headerMode: 'none',
+    }
+)
+const App = createAppContainer(AppNavigator);
+
+export default App;
 
 
 
