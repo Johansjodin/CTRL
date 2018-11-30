@@ -27,7 +27,7 @@ export default class LoginScreen extends React.Component {
 				<SafeAreaView style={styles.container}>
 				
 					<View style={styles.loginWrapper}>
-						<FormInput 
+                        <FormInput 
 							onChangeText={(text) => this.setState({username: text})}
 							containerStyle={styles.formContainer}
 							inputStyle={styles.formInput}
@@ -78,11 +78,13 @@ const styles = StyleSheet.create({
 	formContainer: {
 		borderRadius: 40,
 		borderWidth: 1, 
-		borderColor: '#e3e3e3', 
-		height: '10%',
+        borderColor: '#e3e3e3', 
+        borderBottomColor: '#e3e3e3',
+        height: '10%',
+        marginBottom: 20,
+        paddingLeft: '5%',
 	},
 	formInput: {
 		height: '100%',
-		paddingLeft: '5%',
 	}
 });
