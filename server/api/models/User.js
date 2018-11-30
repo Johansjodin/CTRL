@@ -23,7 +23,11 @@ var UserSchema = new mongoose.Schema({
     bio: String,
     image: String,
     hash: String,
-    salt: String
+    salt: String,
+    colors: {
+        type: [{ type: String, validate: [validateColor, 'not a valid color'] }],
+        validate: [arrayLimit, '{PATH} exceeds the limit of 10']
+    }
 }, {timestamps: true});
 
 UserSchema.plugin(uniqueValidator, {message: 'is already taken.'});
@@ -43,5 +47,13 @@ UserSchema.methods.generateToken = function() {
                       email: this.email,   
                       _id: this._id}, process.env.JWT_SECRET);
 };
-  
+
+function validateColor(color) {
+    return /(^#[0-9A-F]{6}$)|(^#[0-9A-F]{3}$)/i.test(color);
+}
+
+function arrayLimit(val) {
+    return val.length <= 5;
+}
+
 mongoose.model('User', UserSchema);

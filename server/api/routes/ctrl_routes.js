@@ -14,6 +14,10 @@ module.exports = function(app) {
     app.route('/auth/sign_in')
         .post(ctrl.login);
 
+    app.route('/users/:userId/colors')
+        .post(auth.loginRequired, ctrl.set_colors)
+        .get(auth.loginRequired, ctrl.get_user_colors)
+
     app.route('/nodes/')
         .get(ctrl.get_nodes)
         .post(ctrl.create_node);

@@ -50,6 +50,41 @@ exports.login = function(req, res) {
     })
 }
 
+exports.set_colors = function(req, res) {
+    if (req.user._id !== req.params.userId) {
+        return res.status(401).json("Not authorized.").end();
+    }
+    let query = User.findById(req.params.userId);
+    query.exec(function (err, user) {
+        /**
+         * TODO: handle errors better and respond with something that makes sense
+         */
+        if (err) return res.json(err);
+        if (!user) return res.status(404).end();
+
+        user.colors = req.body.colors;
+        user.save(function (err, user) {
+            /**
+            * TODO: handle errors better and respond with something that makes sense
+            */
+            if (err) return res.json(err);
+            res.json(user);
+        });
+    });
+}
+
+exports.get_user_colors = function(req, res) {
+    let query = User.findById(req.params.userId);
+    query.exec(function (err, user) {
+        /**
+         * TODO: handle errors better and respond with something that makes sense
+         */
+        if (err) return res.json(err);
+        if (!user) return res.status(404).end();
+        res.json(user.colors);
+    });
+}
+
 exports.create_node = function(req, res) {
     console.log(req.body);
     let node = new NodeSchema({name: req.body.name,
