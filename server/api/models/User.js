@@ -27,7 +27,8 @@ var UserSchema = new mongoose.Schema({
     colors: {
         type: [{ type: String, validate: [validateColor, 'not a valid color'] }],
         validate: [arrayLimit, '{PATH} exceeds the limit of 10']
-    }
+    },
+    admin: { type: Boolean, default: false },
 }, {timestamps: true});
 
 UserSchema.plugin(uniqueValidator, {message: 'is already taken.'});
@@ -43,9 +44,10 @@ UserSchema.methods.validPassword = function(password) {
 };
 
 UserSchema.methods.generateToken = function() {
-    return jwt.sign({ username: this.username, 
-                      email: this.email,   
-                      _id: this._id}, process.env.JWT_SECRET);
+    return jwt.sign({ username: this.username,
+                      email: this.email,
+                      _id: this._id,
+                      admin: this.admin}, process.env.JWT_SECRET);
 };
 
 UserSchema.methods.getProfile = function() {
