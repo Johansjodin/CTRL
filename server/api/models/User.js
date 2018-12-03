@@ -47,7 +47,9 @@ UserSchema.methods.generateToken = function() {
     return jwt.sign({ username: this.username,
                       email: this.email,
                       _id: this._id,
-                      admin: this.admin}, process.env.JWT_SECRET);
+                      admin: this.admin},
+                    process.env.JWT_SECRET,
+                    { expiresIn: '24h' });
 };
 
 UserSchema.methods.getProfile = function() {
