@@ -20,7 +20,7 @@ module.exports = function(app) {
 
     app.route('/nodes/')
         .get(ctrl.get_nodes)
-        .post(auth.adminRequired, ctrl.create_node);
+        .post(auth.loginRequired, auth.adminRequired, ctrl.create_node);
 
     app.route('/stream')
         .get(ctrl.stream_events);

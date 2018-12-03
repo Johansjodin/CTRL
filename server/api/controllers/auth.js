@@ -6,7 +6,7 @@ exports.loginRequired = function(req, res, next) {
     if (req.user) {
         next();
     } else {
-        return res.status(401).json({ message: 'Unauthorized user!' });
+        return res.status(401).json({ message: 'Unauthorized user, login required' });
     }
 };
 
@@ -20,7 +20,7 @@ exports.validateToken = function(req, res, next) {
 }
 
 exports.adminRequired = function(req, res, next) {
-    if (req.user.admin) {
+    if (req.user && req.user.admin) {
         next();
     } else {
         return res.status(401).json({ message: 'Unauthorized user, admin required' });
