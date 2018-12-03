@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, View, Text } from 'react-native';
 import { RoundedBox } from './roundedBox';
-import { TwitterPicker } from 'react-color'; // TODO fixa colorpickern :)
+import { TwitterPicker } from 'react-color'; // TODO fixa colorpickern 
 
 export const IdentifierBox = (props) => {
     return (

@@ -7,14 +7,14 @@ import { StatsBox } from '../components/statsBox';
 import { ZoneList } from '../components/zoneList';
 import { IdentifierBox } from '../components/identifierBox';
 const spacerSize = 1000;
+
 export default class ProfileScreen extends React.Component {
     
-
     constructor(props) {
         super(props);
 
         this.state = {
-            username: 'JOHANSJODIN',
+            username: 'USERNAME',
             stats: {
                 current: 5,
                 total: 17,

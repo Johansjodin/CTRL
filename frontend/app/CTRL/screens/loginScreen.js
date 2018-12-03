@@ -1,16 +1,11 @@
 import React from 'react';
-import { StyleSheet, View, SafeAreaView, Image, StatusBar } from 'react-native';
-import { Button, Icon, Text } from 'react-native-elements';
+import { StyleSheet, View, Image, StatusBar } from 'react-native';
 import { RoundButton } from '../components/roundButton';
 
 export default class LoginScreen extends React.Component {
 
     constructor(props) {
         super(props);
-
-        this.state = {
-           test: 0
-        }
     }
 
     componentDidMount() {
@@ -20,7 +15,7 @@ export default class LoginScreen extends React.Component {
 	render() {
 		return (
             <View style={styles.container}>
-                <Image source={require('../assets/logo2.png')} style={styles.image} resizeMethod={'resize'} resizeMode={'contain'}/>
+                <Image source={require('../assets/logo.png')} style={styles.image} resizeMethod={'resize'} resizeMode={'contain'}/>
                 <View style={styles.buttons}>
                     <RoundButton
                         border

@@ -1,6 +1,6 @@
 import React from 'react';
-import { StyleSheet, View, SafeAreaView, Image, TouchableWithoutFeedback, Animated } from 'react-native';
-import { Card, ListItem, Button, Icon, FormLabel, FormInput, FormValidationMessage, Text } from 'react-native-elements';
+import { StyleSheet, View, SafeAreaView, TouchableWithoutFeedback, Animated } from 'react-native';
+import { FormInput } from 'react-native-elements';
 import DismissKeyboard from 'dismissKeyboard';
 import { RoundButton } from '../components/roundButton';
 
@@ -19,7 +19,6 @@ export default class RegisterScreen extends React.Component {
     }
     
     componentDidMount() {
-        console.log(this.state.headingDelay);
         Animated.timing(
             this.state.headingDelay, 
             {
