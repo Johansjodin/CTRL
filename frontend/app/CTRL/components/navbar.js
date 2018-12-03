@@ -11,18 +11,28 @@ export default class Navbar extends React.Component {
 		return (
             <View style={styles.menu}>
                 <Button
-                    backgroundColor='#ff5555'
-                    title='Press meh PsO'
+                    icon={{
+                        name: 'map',
+                        size: 35,
+                        color: this.props.active === 'map' ? '#ff5555' : 'black',
+                        style: { marginRight: 0 }
+                    }}
+                    backgroundColor='white'
                     buttonStyle={styles.buttonStyle}
                     containerViewStyle={styles.buttonContainer} 
-                    onPress={() => this.props.navigate('LoginScreen')}
+                    onPress={() => this.props.navigate('MapScreen')}
                 />
                 <Button
-                    backgroundColor='#ff5555'
-                    title='Press meh PRO2'
+                    icon={{
+                        name: 'person',
+                        size: 35,
+                        color: this.props.active === 'profile' ? '#ff5555' : 'black',
+                        style: { marginRight: 0 }
+                    }}
+                    backgroundColor='white'
                     buttonStyle={styles.buttonStyle}
                     containerViewStyle={styles.buttonContainer} 
-                    onPress={() => this.props.navigate('LoginScreen')}
+                    onPress={() => this.props.navigate('ProfileScreen')}
                 />
             </View>
 		);
@@ -31,15 +41,16 @@ export default class Navbar extends React.Component {
 
 const styles = StyleSheet.create({
     menu: {
+        flexShrink: 0,
         flexDirection: 'row',
-        height: 60,
+        height: 70,
     },  
     buttonStyle: {
-        height: 60,
-        margin:0,
+        height: '100%',
+        margin: 0,
     },
     buttonContainer: {
-        height: 60,
+        height: '100%',
         flexGrow: 1,
         marginLeft:0,
         marginRight:0,

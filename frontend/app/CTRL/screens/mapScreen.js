@@ -1,8 +1,9 @@
 import React from 'react';
-import { StyleSheet, Text, View, SafeAreaView, Image, StatusBar } from 'react-native';
-import { Button, Icon } from 'react-native-elements';
+import { StyleSheet, View} from 'react-native';
 import MapView, { PROVIDER_GOOGLE } from 'react-native-maps';
 import Navbar from '../components/navbar';
+import NodeInfo from '../components/nodeInfo';
+import { getNodes } from '../api/api';
 
 export default class LoginScreen extends React.Component {
 
@@ -16,65 +17,71 @@ export default class LoginScreen extends React.Component {
                 latitudeDelta: 0.0025,
                 longitudeDelta: 0.0025,
             },
-            nodes: [
-                {
-                    title: "hej",
-                    coordinates: {
-                        latitude: 65.617030,
-                        longitude: 22.137518,
-                    },
-                    key: 1,
-                },
-                {
-                    title: "hej2",
-                    coordinates: {
-                        longitude: 22.137875,
-                        latitude: 65.617604,
-                    },
-                    key: 2,
-                }
-            ],
+            nodes: [],
             selectedNode: {
                 title: "",
                 coordinates: {
                     latitude: 0.0,
                     longitude: 0.0,
                 },
-                key: 0,
-            }
+            },
+            showInfo: false,
         }
-
         this.nodeClick = this.nodeClick.bind(this);
+        this.hideNodeInfo = this.hideNodeInfo.bind(this);
+    }
+
+    hideNodeInfo(e) {
+        this.setState({
+            showInfo: false
+        });
     }
 
     nodeClick(e) {
+        e.stopPropagation();
         let latitude = e.nativeEvent.coordinate.latitude;
         let longitude = e.nativeEvent.coordinate.longitude;
-        console.log(latitude);
         this.setState({
             "selectedNode": {
                 "coordinates": {
                     "latitude": latitude, 
                     "longitude": longitude
                 }
-            }
+            },
+            showInfo: true
         })
     }
 
-    componentDidMount() {
-        StatusBar.setHidden(true);
+    async componentDidMount() {
+        let nodes = await getNodes();
+        let convertedNodes = nodes.map(node => {
+            return {
+                key: node._id,
+                title: node.name,
+                coordinates: {
+                    latitude: node.coordinates[0],
+                    longitude: node.coordinates[1]
+                },
+                captured_at: node.captured_at
+            }
+        });
+
+        this.setState({
+            nodes: [...convertedNodes]
+        }); 
      }
 
 	render() {
 		return (
-            <View style={styles.container}>
+            <View style={styles.container} >
                 <MapView
-                    region={this.state.region}
+                    initialRegion={this.state.region}
                     provider={PROVIDER_GOOGLE}
                     style={{width: '100%', flex: 1}}
                     showsBuildings
                     showsIndoors
                     showsPointsOfInterest
+                    onPress={this.hideNodeInfo}
                 >
                     {this.state.nodes.map(node => (
                         <MapView.Marker
@@ -86,11 +93,10 @@ export default class LoginScreen extends React.Component {
                         />
                     ))}
                 </MapView>
-                <View style={styles.nodeInfo}>
-                    <Text>Coordinates: {this.state.selectedNode.coordinates.latitude}</Text>
-                </View>
-                <Navbar navigate={this.props.navigation.navigate} />
-               
+
+                { this.state.showInfo ? <NodeInfo nodeInfo={this.state.selectedNode}/> : null }
+
+                <Navbar navigate={this.props.navigation.navigate} active={'map'} />
             </View>
 		);
 	}
@@ -102,13 +108,5 @@ const styles = StyleSheet.create({
 		flexDirection: 'column',
 		alignItems: 'center',
         justifyContent: 'space-between',
-    },
-    nodeInfo: {
-        backgroundColor: 'white',
-        height: 200,
-        width: '100%',
-        marginTop: -200,
-        padding: 25,
-    }
-    
+    },    
 });
