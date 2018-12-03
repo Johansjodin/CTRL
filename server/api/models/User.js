@@ -48,6 +48,18 @@ UserSchema.methods.generateToken = function() {
                       _id: this._id}, process.env.JWT_SECRET);
 };
 
+UserSchema.methods.getProfile = function() {
+    return {
+        id: this._id,
+        username: this.username,
+        email: this.email,
+        bio: this.bio,
+        image: this.image,
+        colors: this.colors,
+        createdAt: this.createdAt
+    }
+}
+
 function validateColor(color) {
     return /(^#[0-9A-F]{6}$)|(^#[0-9A-F]{3}$)/i.test(color);
 }

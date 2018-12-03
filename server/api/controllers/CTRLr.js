@@ -8,7 +8,6 @@ var mongoose = require('mongoose'),
     NodeSchema = mongoose.model('Node');
 
 exports.create_user = function(req, res) {
-    console.log(req.body);
     let user = new User({username: req.body.username,
                          email: req.body.email});
     user.setPassword(req.body.password);
@@ -20,12 +19,12 @@ exports.create_user = function(req, res) {
             console.error(err);
             return res.json(err);
         }
-        res.json(user);
+        res.json(user.getProfile());
     });
 };
 
 exports.get_user = function(req, res) {
-    let query = User.findById(req.params.userId).select({ "username": 1, "_id": 0});
+    let query = User.findById(req.params.userId);
 
     query.exec(function (err, user) {
         /**
@@ -33,7 +32,7 @@ exports.get_user = function(req, res) {
          */
         if (err) return res.json(err);
         if (!user) return res.status(404).end();
-        res.json(user);
+        res.json(user.getProfile());
     });
 };
 
@@ -86,10 +85,9 @@ exports.get_user_colors = function(req, res) {
 }
 
 exports.create_node = function(req, res) {
-    console.log(req.body);
     let node = new NodeSchema({name: req.body.name,
         coordinates: req.body.coordinates});
-    console.log(node);
+
     node.save(function (err, node) {
         if (err) {
             /**
