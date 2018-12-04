@@ -46,7 +46,6 @@ UserSchema.methods.validPassword = function(password) {
 
 UserSchema.methods.generateToken = function() {
     return jwt.sign({ username: this.username,
-                      email: this.email,
                       _id: this._id,
                       admin: this.admin},
                     process.env.JWT_SECRET,
@@ -57,7 +56,6 @@ UserSchema.methods.getProfile = function() {
     return {
         id: this._id,
         username: this.username,
-        email: this.email,
         bio: this.bio,
         image: this.image,
         colors: this.colors,
