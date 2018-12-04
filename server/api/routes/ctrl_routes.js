@@ -29,6 +29,6 @@ module.exports = function(app) {
         .get(ctrl.test_event);
 
     app.route('/capture')
-        .get(ctrl.test_capture);
+        .post(ctrl.test_capture);
 
 };

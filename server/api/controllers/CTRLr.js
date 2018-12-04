@@ -128,8 +128,22 @@ exports.test_event = function(req, res) {
 };
 
 exports.test_capture = function(req, res) {
-    let node = {id: 1, owner: 123};
-    let newowner = 222;
-    sse.send({node, newowner}, 'capture');
-    res.json(newowner);
+    NodeSchema.findByIdAndUpdate(req.body.nodeId,
+                                { $set: { owner: req.body.newowner,
+                                          captured_at: new Date() }},{ new: true })
+    .populate({ path: 'owner', select: '-salt -hash -admin -updatedAt'})
+    .exec(function (err, node) {
+        /**
+         * TODO: handle errors better and respond with something that makes sense
+         */
+        if (err) return res.json(err);
+        if (!node) return res.status(404).end();
+
+        sse.send({node, newowner: req.body.newowner}, 'capture');
+
+        //node.capture(req.body.newowner);
+        //node.name = "intefetnode";
+        //node.save();
+        res.json(node);
+    });
 };

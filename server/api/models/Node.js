@@ -12,7 +12,7 @@ var NodeSchema = new mongoose.Schema({
         type: [Number],
         required: true},
     owner: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-    captured_at : { type : Date, default: Date.now }
+    captured_at: { type : Date, default: Date.now() }
 });
 
 NodeSchema.plugin(uniqueValidator, {message: 'is already taken.'});
@@ -25,9 +25,12 @@ NodeSchema.methods.getValue = function(time) {
     return time*2;
 }
 
-NodeSchema.methods.capture = function(user) {
-    this.owner = user;
-    this.captured_at = Date.now;
+NodeSchema.methods.capture = function(userId) {
+    console.log(typeof userId);
+    console.log(this.owner);
+    this.owner = userId;
+    this.captured_at = new Date();
+    console.log(typeof this.owner);
 }
 
 mongoose.model('Node', NodeSchema);
