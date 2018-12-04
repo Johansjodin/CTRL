@@ -12,7 +12,7 @@ module.exports = function(app) {
         .get(ctrl.get_user);
 
     app.route('/auth/sign_in')
-        .post(ctrl.login);
+        .post(auth.googleAuth, ctrl.login);
 
     app.route('/users/:userId/colors')
         .post(auth.loginRequired, ctrl.set_colors)
@@ -30,5 +30,8 @@ module.exports = function(app) {
 
     app.route('/capture')
         .post(ctrl.test_capture);
+
+    app.route('/auth/sign_up')
+        .post(auth.googleAuth, ctrl.create_user)
 
 };
