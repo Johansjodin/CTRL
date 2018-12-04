@@ -33,6 +33,7 @@ exports.adminRequired = function(req, res, next) {
 exports.googleAuth = async function (req, res, next) {
     const client = new OAuth2Client(process.env.GOOGLE_ANDROID_CLIENT_ID);
     let ticket;
+    if (!req.token) {return res.status(401).json({ message: 'Unauthorized user, missing token' });}
     try {
         ticket = await client.verifyIdToken({
             idToken: req.token,
