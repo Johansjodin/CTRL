@@ -42,9 +42,9 @@ exports.googleAuth = async function (req, res, next) {
             //[CLIENT_ID_1, CLIENT_ID_2, CLIENT_ID_3]
         });
     } catch (err){
+        console.log(err);
         return res.status(401).json({ message: 'Unauthorized user, missing token' });
     }
-    console.log(ticket);
     const payload = ticket.getPayload();
     const userId = payload['sub'];
     if (!userId) { return res.status(401).json({ message: 'Unauthorized user, missing token' }); }
