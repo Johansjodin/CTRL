@@ -18,7 +18,7 @@ exports.create_user = function(req, res) {
             console.error(err);
             return res.json(err);
         }
-        res.json(user.getProfile());
+        res.json({user: user.getProfile(), token: user.generateToken()});
     });
 };
 
@@ -42,7 +42,7 @@ exports.login = function(req, res) {
         if (err) throw err;
         if (!user) return res.status(401).json("Authentication failed, User not found.").end();
 
-        return res.json({token: user.generateToken()});
+        return res.json({user: user.getProfile(), token: user.generateToken()});
     })
 }
 
