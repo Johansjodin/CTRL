@@ -3,6 +3,7 @@ import LoginScreen from './screens/loginScreen';
 import MapScreen from './screens/mapScreen';
 import ProfileScreen from './screens/profileScreen';
 import RegisterScreen from './screens/registerScreen';
+import CaptureScreen from  './screens/captureScreen';
 import { createStackNavigator, createAppContainer, createSwitchNavigator } from 'react-navigation';
 
 const fade = (props) => {
@@ -42,6 +43,7 @@ const AppStack = createStackNavigator(
     {
         MapScreen: {screen: MapScreen},
         ProfileScreen: {screen: ProfileScreen},
+        CaptureScreen: {screen: CaptureScreen},
     },
     {
         initialRouteName: "MapScreen",

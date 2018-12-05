@@ -1,15 +1,31 @@
 import React from 'react';
 import { StyleSheet, View, Image, StatusBar } from 'react-native';
-import { RoundButton } from '../components/roundButton';
+import { RoundedButton } from '../components/roundedButton';
+import { signIn, signInWithGoogleAsync } from '../api/api';
 
 export default class LoginScreen extends React.Component {
 
     constructor(props) {
         super(props);
+
+        this.handleSignIn = this.handleSignIn.bind(this);
     }
 
     componentDidMount() {
         StatusBar.setHidden(true);
+    }
+
+    async handleSignIn() {
+        let idToken = await signInWithGoogleAsync(); 
+
+        try {
+            await signIn(idToken);
+            // SAVE TO FILE or something
+            this.props.navigation.navigate('MapScreen');
+
+        } catch (err) {
+            return; // TODO show something
+        }
     }
 
 	render() {
@@ -17,16 +33,16 @@ export default class LoginScreen extends React.Component {
             <View style={styles.container}>
                 <Image source={require('../assets/logo.png')} style={styles.image} resizeMethod={'resize'} resizeMode={'contain'}/>
                 <View style={styles.buttons}>
-                    <RoundButton
+                    <RoundedButton
                         border
                         backgroundColor='transparent'
                         title='Register' 
-                        onPress={() => this.props.navigation.navigate('RegisterScreen')}
+                        onPress={() => {this.props.navigation.navigate('RegisterScreen');}}
                     />
-                    <RoundButton
+                    <RoundedButton
                         backgroundColor='#23A6D5'
                         title='Sign in' 
-                        onPress={() => this.props.navigation.navigate('MapScreen')}
+                        onPress={this.handleSignIn}
                     />
                 </View>
             </View>

@@ -1,8 +1,10 @@
 import React from 'react';
 import { StyleSheet, View, SafeAreaView, TouchableWithoutFeedback, Animated } from 'react-native';
+import Expo from 'expo';
 import { FormInput } from 'react-native-elements';
 import DismissKeyboard from 'dismissKeyboard';
-import { RoundButton } from '../components/roundButton';
+import { RoundedButton } from '../components/roundedButton';
+import { signUp, signInWithGoogleAsync } from '../api/api';
 
 export default class RegisterScreen extends React.Component {
 
@@ -18,7 +20,10 @@ export default class RegisterScreen extends React.Component {
 		this.handleSubmit = this.handleSubmit.bind(this);
     }
     
-    componentDidMount() {
+    async componentDidMount() {
+
+        this.tokenId = await signInWithGoogleAsync();
+
         Animated.timing(
             this.state.headingDelay, 
             {
@@ -37,8 +42,13 @@ export default class RegisterScreen extends React.Component {
         ).start();
     }
 
-	handleSubmit(e) {
+	async handleSubmit(e) {
+        //SEND TO API
+        
+        await signUp(this.tokenId, this.state.username);
         this.props.navigation.navigate('MapScreen');
+
+        //this.signInWithGoogleAsync();
 	}
 
 	render() {
@@ -58,7 +68,7 @@ export default class RegisterScreen extends React.Component {
 						/> 
 					</Animated.View>
                     <View style={styles.buttons}>
-                        <RoundButton
+                        <RoundedButton
                             backgroundColor='#23A6D5'
                             title='Sign up' 
                             onPress={this.handleSubmit}

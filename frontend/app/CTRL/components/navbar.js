@@ -34,6 +34,18 @@ export default class Navbar extends React.Component {
                     containerViewStyle={styles.buttonContainer} 
                     onPress={() => this.props.navigate('ProfileScreen')}
                 />
+                <Button
+                    icon={{
+                        name: 'person',
+                        size: 35,
+                        color: 'blue',
+                        style: { marginRight: 0 }
+                    }}
+                    backgroundColor='white'
+                    buttonStyle={styles.buttonStyle}
+                    containerViewStyle={styles.buttonContainer} 
+                    onPress={() => this.props.navigate('CaptureScreen')}
+                />
             </View>
 		);
 	}

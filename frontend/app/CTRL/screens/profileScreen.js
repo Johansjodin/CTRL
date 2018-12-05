@@ -2,7 +2,7 @@ import React from 'react';
 import { StyleSheet, View, ScrollView } from 'react-native';
 import { Text, Avatar } from 'react-native-elements';
 import Navbar from '../components/navbar';
-import { RoundButton } from '../components/roundButton';
+import { RoundedButton } from '../components/roundedButton';
 import { StatsBox } from '../components/statsBox';
 import { ZoneList } from '../components/zoneList';
 import { IdentifierBox } from '../components/identifierBox';
@@ -62,7 +62,7 @@ export default class ProfileScreen extends React.Component {
                                 <Text style={{color:'white', width: '100%', marginBottom: 15, marginLeft: 20, marginTop: 50,}}>Controlled zones</Text>
                                 <ZoneList zones={this.state.categories.current} />
                                 
-                                <RoundButton
+                                <RoundedButton
                                     backgroundColor='#ff5555'
                                     title='Log out' 
                                     width={100}
