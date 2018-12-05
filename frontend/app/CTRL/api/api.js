@@ -14,7 +14,6 @@ export async function getNodes() {
 }
 
 export async function signUp(tokenId, username) {
-    console.log(tokenId);
     try {
         let response = await fetch('https://api.ctrl.nu/auth/sign_up', {
             method: 'POST',
@@ -29,6 +28,7 @@ export async function signUp(tokenId, username) {
         });
 
         let responseJson = await response.json();
+        console.log("TYPE: " + typeof responseJson.token)
         SecureStore.setItemAsync('jwt', responseJson.token);
         console.log(responseJson);
 

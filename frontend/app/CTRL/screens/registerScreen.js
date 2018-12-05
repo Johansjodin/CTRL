@@ -22,7 +22,7 @@ export default class RegisterScreen extends React.Component {
     
     async componentDidMount() {
 
-        this.tokenId = await signInWithGoogleAsync();
+        this.tokenId = this.props.navigation.getParam('idToken', null)
 
         Animated.timing(
             this.state.headingDelay, 

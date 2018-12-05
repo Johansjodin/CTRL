@@ -9,6 +9,7 @@ export default class LoginScreen extends React.Component {
         super(props);
 
         this.handleSignIn = this.handleSignIn.bind(this);
+        this.handleSignUp = this.handleSignUp.bind(this);
     }
 
     componentDidMount() {
@@ -17,11 +18,22 @@ export default class LoginScreen extends React.Component {
 
     async handleSignIn() {
         let idToken = await signInWithGoogleAsync(); 
-
         try {
             await signIn(idToken);
             // SAVE TO FILE or something
             this.props.navigation.navigate('MapScreen');
+
+        } catch (err) {
+            return; // TODO show something
+        }
+    }
+
+    async handleSignUp() {
+        let idToken = await signInWithGoogleAsync(); 
+        console.log("idtoken: " + idToken);
+        try {
+            // SAVE TO FILE or something
+            this.props.navigation.navigate('RegisterScreen', {idToken: idToken});
 
         } catch (err) {
             return; // TODO show something
@@ -37,7 +49,7 @@ export default class LoginScreen extends React.Component {
                         border
                         backgroundColor='transparent'
                         title='Register' 
-                        onPress={() => {this.props.navigation.navigate('RegisterScreen');}}
+                        onPress={this.handleSignUp}
                     />
                     <RoundedButton
                         backgroundColor='#23A6D5'
