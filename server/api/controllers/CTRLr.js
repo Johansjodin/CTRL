@@ -64,7 +64,7 @@ exports.set_colors = function(req, res) {
             * TODO: handle errors better and respond with something that makes sense
             */
             if (err) return res.json(err);
-            res.json(user);
+            res.json(user.colors);
         });
     });
 }
