@@ -1,41 +1,54 @@
 import React from 'react';
 import { StyleSheet, View, Image, StatusBar } from 'react-native';
 import { RoundedButton } from '../components/roundedButton';
+import EmergencyBar from '../components/EmergencyBar';
 import { signIn, signInWithGoogleAsync } from '../api/api';
+import {SecureStore} from "expo";
+import NodeInfo from "../components/nodeInfo";
 
 export default class LoginScreen extends React.Component {
 
     constructor(props) {
         super(props);
-
+        this.state={showError:false, errorMessage:''}
         this.handleSignIn = this.handleSignIn.bind(this);
         this.handleSignUp = this.handleSignUp.bind(this);
     }
 
-    componentDidMount() {
+    async componentDidMount() {
         StatusBar.setHidden(true);
+        let token = await SecureStore.getItemAsync('jwt');
+        if(token != undefined){
+            try{
+                await signIn(token);  // TODO: fix this
+                this.props.navigation.navigate('MapScreen');
+            } catch (e) {
+                console.log('loginScreen.js::'+e.message);
+                this.setState({showError:true, errorMessage: 'Auto-Sign in failed. Manual login required.'});
+            }
+        }
     }
 
     async handleSignIn() {
-        let idToken = await signInWithGoogleAsync(); 
         try {
+            let idToken = await signInWithGoogleAsync();
             await signIn(idToken);
-            // SAVE TO FILE or something
             this.props.navigation.navigate('MapScreen');
 
-        } catch (err) {
+        } catch (e) {
+            console.log('loginScreen.js::'+e.message);
+            this.setState({showError:true, errorMessage: 'Sign in with Google failed. Do try again.'});
             return; // TODO show something
         }
     }
 
     async handleSignUp() {
-        let idToken = await signInWithGoogleAsync(); 
-        console.log("idtoken: " + idToken);
         try {
-            // SAVE TO FILE or something
+            let idToken = await signInWithGoogleAsync();
             this.props.navigation.navigate('RegisterScreen', {idToken: idToken});
 
-        } catch (err) {
+        } catch (e) {
+            this.setState({showError:true, errorMessage: 'Sign in with Google failed. Do try again.'});
             return; // TODO show something
         }
     }
@@ -43,18 +56,19 @@ export default class LoginScreen extends React.Component {
 	render() {
 		return (
             <View style={styles.container}>
+                { this.state.showError ? <EmergencyBar message={this.state.errorMessage}/> : null }
                 <Image source={require('../assets/logo.png')} style={styles.image} resizeMethod={'resize'} resizeMode={'contain'}/>
                 <View style={styles.buttons}>
                     <RoundedButton
                         border
                         backgroundColor='transparent'
-                        title='Register' 
-                        onPress={this.handleSignUp}
+                        title='Register'
+                        onPress={() => this.handleSignUp()}
                     />
                     <RoundedButton
                         backgroundColor='#23A6D5'
-                        title='Sign in' 
-                        onPress={this.handleSignIn}
+                        title='Sign in'
+                        onPress={() => this.handleSignIn()}
                     />
                 </View>
             </View>

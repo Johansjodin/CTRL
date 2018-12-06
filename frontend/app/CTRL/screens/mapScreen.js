@@ -3,7 +3,9 @@ import { StyleSheet, View} from 'react-native';
 import MapView, { PROVIDER_GOOGLE } from 'react-native-maps';
 import Navbar from '../components/navbar';
 import NodeInfo from '../components/nodeInfo';
-import { getNodes } from '../api/api';
+import { getNodes, getColor } from '../api/api';
+import { SecureStore } from 'expo';
+import { store } from '../components/store'
 
 export default class LoginScreen extends React.Component {
 
@@ -37,16 +39,26 @@ export default class LoginScreen extends React.Component {
         });
     }
 
-    nodeClick(e) {
-        e.stopPropagation();
-        let latitude = e.nativeEvent.coordinate.latitude;
-        let longitude = e.nativeEvent.coordinate.longitude;
+    async nodeClick(node) {
+        let response;
+        try{
+            let token = await SecureStore.getItemAsync('jwt');
+            response = await getColor(store.uid, token);    // TODO: change getColor to get node.owner's colors
+        } catch (e) {
+            console.log('mapScreen.js::nodeClick::Error retrieving node info.');
+        }
+
         this.setState({
             "selectedNode": {
+                'key':  node.key,
+                'title': node.title,
+                'owner': node.owner,
                 "coordinates": {
-                    "latitude": latitude, 
-                    "longitude": longitude
-                }
+                    "latitude": node.coordinates.latitude,
+                    "longitude": node.coordinates.longitude,
+                },
+                'captured_at':  node.captured_at,
+                'colors':(response) ? response : [],
             },
             showInfo: true
         })
@@ -58,9 +70,10 @@ export default class LoginScreen extends React.Component {
             return {
                 key: node._id,
                 title: node.name,
+                owner: node.owner,
                 coordinates: {
                     latitude: node.coordinates[0],
-                    longitude: node.coordinates[1]
+                    longitude: node.coordinates[1],
                 },
                 captured_at: node.captured_at
             }
@@ -68,7 +81,7 @@ export default class LoginScreen extends React.Component {
 
         this.setState({
             nodes: [...convertedNodes]
-        }); 
+        });
      }
 
 	render() {
@@ -87,9 +100,7 @@ export default class LoginScreen extends React.Component {
                         <MapView.Marker
                             key={node.key}
                             coordinate={node.coordinates}
-                            title={node.title}
-                            key={node.key}
-                            onPress={this.nodeClick}
+                            onPress={() => {this.nodeClick(node)}}
                         />
                     ))}
                 </MapView>

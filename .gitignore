@@ -1,7 +1,12 @@
 node_modules/
+.gitignore
 .env
 *.sublime-project
 *.sublime-workspace
 .expo
 .watchmanconfig
 .vscode
+frontend/app/CTRL/.idea/
+frontend/app/CTRL/.expo/
+frontend/app/CTRL/node_modules/
+frontend/app/CTRL/CTRL.iml

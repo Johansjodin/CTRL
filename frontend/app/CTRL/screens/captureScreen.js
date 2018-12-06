@@ -1,6 +1,7 @@
 import React from 'react';
-import { StyleSheet, View, TouchableOpacity } from 'react-native';
+import {StyleSheet, View, TouchableOpacity, ScrollView} from 'react-native';
 import { Text } from 'react-native-elements';
+import Navbar from "../components/navbar";
 
 export default class CaptureScreen extends React.Component {
 
@@ -10,10 +11,13 @@ export default class CaptureScreen extends React.Component {
 
 	render() {
 		return (
-            <View style={styles.container}>
-                <TouchableOpacity style={styles.circle} >
-                    <Text style={styles.text}>Capture</Text>
-                </TouchableOpacity>
+            <View style={{flex: 1}}>
+                <View style={styles.container}>
+                    <TouchableOpacity style={styles.circle} >
+                        <Text style={styles.text}>Capture</Text>
+                    </TouchableOpacity>
+                </View>
+                <Navbar navigate={this.props.navigation.navigate} active={'capture'} />
             </View>
 		);
 	}
@@ -30,6 +34,8 @@ const styles = StyleSheet.create({
     circle: {
         width: 250,
         height: 250,
+        borderWidth: 10,
+        borderColor: '#200808',
         borderRadius: 125,
         backgroundColor: '#ff5555',
         alignItems: 'center',

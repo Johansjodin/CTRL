@@ -1,10 +1,8 @@
 import React from 'react';
-import { StyleSheet, View, SafeAreaView, TouchableWithoutFeedback, Animated } from 'react-native';
-import Expo from 'expo';
+import { Keyboard, StyleSheet, View, SafeAreaView, TouchableWithoutFeedback, Animated } from 'react-native';
 import { FormInput } from 'react-native-elements';
-import DismissKeyboard from 'dismissKeyboard';
 import { RoundedButton } from '../components/roundedButton';
-import { signUp, signInWithGoogleAsync } from '../api/api';
+import {signUp} from '../api/api';
 
 export default class RegisterScreen extends React.Component {
 
@@ -20,7 +18,7 @@ export default class RegisterScreen extends React.Component {
 		this.handleSubmit = this.handleSubmit.bind(this);
     }
     
-    async componentDidMount() {
+    componentDidMount() {
 
         this.tokenId = this.props.navigation.getParam('idToken', null)
 
@@ -43,17 +41,20 @@ export default class RegisterScreen extends React.Component {
     }
 
 	async handleSubmit(e) {
-        //SEND TO API
-        
-        await signUp(this.tokenId, this.state.username);
-        this.props.navigation.navigate('MapScreen');
+        try {
+            await signUp(this.tokenId);
+            // SAVE TO FILE or something
+            this.props.navigation.navigate('MapScreen');
 
-        //this.signInWithGoogleAsync();
+        } catch (err) {
+            console.log("loginScreen.js::Error signing in:"+err.message)
+            return; // TODO show something
+        }
 	}
 
 	render() {
 		return (
-			<TouchableWithoutFeedback onPress={()=>{DismissKeyboard()}}>
+			<TouchableWithoutFeedback onPress={()=>{Keyboard.dismiss()}}>
 				<SafeAreaView style={styles.container}>
                     <Animated.Text style={{color:'white', fontSize: 40, marginTop: 50, opacity: this.state.headingDelay}}>Almost done!</Animated.Text>
                     <Animated.Text style={{color:'white', fontSize: 30, marginTop: 20, opacity: this.state.subtitleDelay}}>Select a username</Animated.Text>

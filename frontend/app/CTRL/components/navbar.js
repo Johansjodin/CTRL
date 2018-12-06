@@ -14,7 +14,7 @@ export default class Navbar extends React.Component {
                     icon={{
                         name: 'map',
                         size: 35,
-                        color: this.props.active === 'map' ? '#ff5555' : 'black',
+                        color: this.props.active === 'map' ? '#23A6D5' : 'black',
                         style: { marginRight: 0 }
                     }}
                     backgroundColor='white'
@@ -26,7 +26,7 @@ export default class Navbar extends React.Component {
                     icon={{
                         name: 'person',
                         size: 35,
-                        color: this.props.active === 'profile' ? '#ff5555' : 'black',
+                        color: this.props.active === 'profile' ? '#23A6D5' : 'black',
                         style: { marginRight: 0 }
                     }}
                     backgroundColor='white'
@@ -36,9 +36,9 @@ export default class Navbar extends React.Component {
                 />
                 <Button
                     icon={{
-                        name: 'person',
+                        name: 'camera',
                         size: 35,
-                        color: 'blue',
+                        color: this.props.active === 'capture' ? '#23A6D5' : 'black',
                         style: { marginRight: 0 }
                     }}
                     backgroundColor='white'

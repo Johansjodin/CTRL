@@ -7,18 +7,19 @@ export class ZoneList extends React.Component {
     render() {
         return (
             <RoundedBox>
-                {this.props.zones !== undefined && this.props.zones.map((zone, index) => (
+                { (this.props.zones !== undefined && this.props.empty !== undefined) && this.props.zones.map((zone,index) => (
                     <View style={styles.zone} key={index}>
-                        <Text style={styles.zoneName}>{zone}</Text>
+                        {this.props.empty ? (
+                            <Text> You do not currently control any zones. </Text>
+                        ) : (
+                            <Text style={styles.zoneName}>{zone}</Text>
+                        )}
                     </View>
                 ))}
             </RoundedBox>
         );
     }
 }
-
-
-
 const styles = StyleSheet.create({
     zone: {
         height: 40,

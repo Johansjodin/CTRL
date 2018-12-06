@@ -6,15 +6,21 @@ import { RoundedButton } from '../components/roundedButton';
 import { StatsBox } from '../components/statsBox';
 import { ZoneList } from '../components/zoneList';
 import { IdentifierBox } from '../components/identifierBox';
+import { store } from '../components/store';
+import { getNodes } from '../api/api'
+import { SecureStore } from 'expo'
 const spacerSize = 1000;
 
 export default class ProfileScreen extends React.Component {
     
     constructor(props) {
         super(props);
-
+        if(!store.hasOwnProperty('myNodes')){ store.myNodes = []; }
+        if(!store.hasOwnProperty('allNodes')){ store.allNodes = []; }
+        if(!store.hasOwnProperty('username')){ console.error(this.constructor.name+'::Error reading username from store.')}
+        if(!store.hasOwnProperty('colors')){ console.error(this.constructor.name+'::Error reading username from store.')}
         this.state = {
-            username: 'USERNAME',
+            username: store.username,
             stats: {
                 current: 5,
                 total: 17,
@@ -22,11 +28,33 @@ export default class ProfileScreen extends React.Component {
             },
             rank: 7,
             categories: {
-                current: ['random name 1', 'random name 2', 'random name 3'],
-                total: ['random name 1', 'random name 2', 'random name 3', 'random name 4', 'random name 5'],
+                current: store.myNodes,
+                total: store.allNodes,
             },
-            identifier: ['#c62828', '#6a1b9a', '#283593', '#0277bd', '#00695c'],
+            identifier: store.colors, //['#c62828', '#6a1b9a', '#283593', '#0277bd', '#00695c'],
+        },
+        this.handleSignOut = this.handleSignOut.bind(this);
+    }
+    async updateNodes(){
+        let nodes = await getNodes();
+        let allNodes = [], myNodes = [];
+        for(let i=0; i<nodes.length; i++){
+            allNodes.push(nodes[i].name);
+            if(nodes[i].id == store.uid){
+                myNodes.push(nodes[i].name);
+            }
         }
+        store.myNodes = myNodes;
+        store.allNodes = allNodes;
+        await this.setState({categories: { current: myNodes, total: allNodes}} );
+    }
+    async componentDidMount() {
+        this.updateNodes();
+    }
+
+    handleSignOut(){
+        SecureStore.deleteItemAsync('jwt');
+        this.props.navigation.navigate('LoginScreen')
     }
 
 	render() {
@@ -60,13 +88,18 @@ export default class ProfileScreen extends React.Component {
                                 <IdentifierBox colors={this.state.identifier} />
 
                                 <Text style={{color:'white', width: '100%', marginBottom: 15, marginLeft: 20, marginTop: 50,}}>Controlled zones</Text>
-                                <ZoneList zones={this.state.categories.current} />
+                                {store.myNodes.length==0 ? (
+                                    <ZoneList empty={true} zones={['']} />
+                                ) : (
+                                    <ZoneList empty={false} zones={this.state.categories.current} />
+                                )}
+
                                 
                                 <RoundedButton
                                     backgroundColor='#ff5555'
                                     title='Log out' 
                                     width={100}
-                                    onPress={() => this.props.navigation.navigate('LoginScreen')}
+                                    onPress={() => this.handleSignOut()}
                                     style={{marginTop: 35}}
                                 />
                             </View>
@@ -136,7 +169,7 @@ const styles = StyleSheet.create({
     },
     rank: {
         padding: 15,
-        marginTop: 50,
+        marginTop: 0,
         marginBottom: 50,
         alignItems: 'center',
     },
