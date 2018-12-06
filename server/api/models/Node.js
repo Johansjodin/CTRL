@@ -26,11 +26,8 @@ NodeSchema.methods.getValue = function(time) {
 }
 
 NodeSchema.methods.capture = function(userId) {
-    console.log(typeof userId);
-    console.log(this.owner);
     this.owner = userId;
     this.captured_at = new Date();
-    console.log(typeof this.owner);
 }
 
 mongoose.model('Node', NodeSchema);

@@ -136,11 +136,12 @@ exports.test_capture = function(req, res) {
         if (err) return res.json(err);
         if (!node) return res.status(404).end();
 
-        sse.send({node, newowner: req.body.newowner}, 'capture');
-
-        //node.capture(req.body.newowner);
-        //node.name = "intefetnode";
-        //node.save();
-        res.json(node);
+        User.findById(req.body.newowner).exec(function (err, user) {
+            if (err) return res.json(err);
+            if (!user) return res.status(404).end();
+            sse.send(node, 'capture');
+            node.capture(req.body.newowner);
+            res.json(user.colors);
+        });
     });
 };
