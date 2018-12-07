@@ -59,7 +59,8 @@ UserSchema.methods.getProfile = function() {
         username: this.username,
         image: this.image,
         colors: this.colors,
-        createdAt: this.createdAt
+        createdAt: this.createdAt,
+        points: this.points
     }
 }
 
