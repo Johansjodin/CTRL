@@ -28,7 +28,8 @@ var UserSchema = new mongoose.Schema({
         validate: [arrayLimit, '{PATH} exceeds the limit of 10']
     },
     admin: { type: Boolean, default: false },
-    googleId: {type: String, unique: true, required: [true, "google id required"]}
+    googleId: {type: String, unique: true, required: [true, "google id required"]},
+    points: { type: Number, default: 0}
 }, {timestamps: true});
 
 UserSchema.plugin(uniqueValidator, {message: 'is already taken.'});
@@ -59,6 +60,10 @@ UserSchema.methods.getProfile = function() {
         colors: this.colors,
         createdAt: this.createdAt
     }
+}
+
+UserSchema.methods.givePoints = function(points) {
+    this.points += points;
 }
 
 function validateColor(color) {

@@ -25,9 +25,9 @@ NodeSchema.methods.getValue = function(time) {
     return time*2;
 }
 
-NodeSchema.methods.capture = function(userId) {
+NodeSchema.methods.capture = function(userId, timestamp) {
     this.owner = userId;
-    this.captured_at = new Date();
+    this.captured_at = timestamp;
 }
 
 mongoose.model('Node', NodeSchema);

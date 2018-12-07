@@ -6,7 +6,8 @@ var sse = new SSE();
 var mongoose = require('mongoose'),
     User = mongoose.model('User'),
     NodeSchema = mongoose.model('Node'),
-    ImageSchema = mongoose.model('Image');
+    ImageSchema = mongoose.model('Image'),
+    CaptureEvent = mongoose.model('CaptureEvent');
 
 exports.create_user = function(req, res) {
     let user = new User({username: req.body.username,
@@ -105,7 +106,9 @@ exports.get_image = function(req, res) {
         if (!image) return res.status(404).end();
 
         res.setHeader('Content-Type', image.file.mimetype);
-        res.sendFile('./uploads/' + image.file.filename, {root: process.cwd()});
+        res.sendFile('./uploads/' + image.file.filename, {root: process.cwd()}, (error) => {
+            if (error) return res.status(400).json("no find image").end();
+        });
     });
 }
 
@@ -158,6 +161,22 @@ exports.get_nodes_owned_by_user = function(req, res) {
     });
 }
 
+exports.get_capture_events_by_user = function (req, res) {
+    CaptureEvent.find({ $or: [ {prevOwner: req.params.userId}, {newOwner: req.params.userId} ] })
+    .exec(function(err, events) {
+        if (err) return res.json(err);
+        res.json(events);
+    });
+}
+
+exports.get_capture_events_by_node = function (req, res) {
+    CaptureEvent.find({node: req.params.nodeId})
+    .exec(function(err, events) {
+        if (err) return res.json(err);
+        res.json(events);
+    });
+}
+
 exports.stream_events = function(req, res) {
     console.log("asf");
     sse.init(req, res);
@@ -173,9 +192,35 @@ exports.test_event = function(req, res) {
 };
 
 exports.test_capture = function(req, res) {
+    let prevOwner;
+    let timestamp = new Date();
+    let points;
+    let ce;
+    NodeSchema.findById(req.body.nodeId)
+    .exec(function (err, node) {
+        if (err) return res.json(err);
+        if (!node) return res.status(404).end();
+
+        prevOwner = node.owner;
+        points = node.getValue(node.secondsSinceCapture(timestamp));
+        ce = new CaptureEvent({ node: req.body.nodeId,
+                                    prevOwner: prevOwner,
+                                    newOwner: req.body.newowner,
+                                    captured_at: timestamp,
+                                    points: points});
+        ce.save(function (err, ce) {
+            /**
+            * TODO: handle errors better and respond with something that makes sense
+            */
+            if (err) return res.json(err);
+        });
+    });
+    /**
+     * for some reason save doesnt work so gotta do this
+     */
     NodeSchema.findByIdAndUpdate(req.body.nodeId,
                                 { $set: { owner: req.body.newowner,
-                                          captured_at: new Date() }},{ new: true })
+                                          captured_at: timestamp }},{ new: true })
     .populate({ path: 'owner', select: '-salt -hash -admin -updatedAt'})
     .exec(function (err, node) {
         /**
@@ -187,8 +232,10 @@ exports.test_capture = function(req, res) {
         User.findById(req.body.newowner).exec(function (err, user) {
             if (err) return res.json(err);
             if (!user) return res.status(404).end();
-            sse.send(node, 'capture');
-            node.capture(req.body.newowner);
+            sse.send(ce, 'capture');
+            node.capture(req.body.newowner, timestamp);
+            user.givePoints(points);
+            user.save();
             res.json(user.colors);
         });
     });

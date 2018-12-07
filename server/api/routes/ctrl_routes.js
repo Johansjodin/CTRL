@@ -22,12 +22,18 @@ module.exports = function(app) {
     app.route('/users/:userId/image')
         .post(auth.loginRequired, upload.single('avatar'), ctrl.set_image)
 
+    app.route('/users/:userId/events')
+        .get(ctrl.get_capture_events_by_user)
+
     app.route('/images/:filename')
         .get(ctrl.get_image)
 
     app.route('/nodes/')
         .get(ctrl.get_nodes)
         .post(auth.loginRequired, auth.adminRequired, ctrl.create_node);
+
+    app.route('/nodes/:nodeId/events')
+        .get(ctrl.get_capture_events_by_node)
 
     app.route('/nodes/:userId')
         .get(ctrl.get_nodes_owned_by_user)
