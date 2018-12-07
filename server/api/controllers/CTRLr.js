@@ -150,6 +150,14 @@ exports.get_nodes = function(req, res) {
     });
 }
 
+exports.get_nodes_owned_by_user = function(req, res) {
+    NodeSchema.find({owner: req.params.userId})
+    .exec(function(err, nodes) {
+        if (err) return res.json(err);
+        res.json(nodes);
+    });
+}
+
 exports.stream_events = function(req, res) {
     console.log("asf");
     sse.init(req, res);

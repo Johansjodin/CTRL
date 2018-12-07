@@ -29,6 +29,9 @@ module.exports = function(app) {
         .get(ctrl.get_nodes)
         .post(auth.loginRequired, auth.adminRequired, ctrl.create_node);
 
+    app.route('/nodes/:userId')
+        .get(ctrl.get_nodes_owned_by_user)
+
     app.route('/stream')
         .get(ctrl.stream_events);
 
