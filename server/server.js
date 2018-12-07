@@ -8,6 +8,7 @@ const express = require('express'),
     mongoose = require('mongoose'),
     User = require('./api/models/User'),
     NodeSchema = require('./api/models/Node'),
+    ImageSchema = require('./api/models/Image'),
     bodyParser = require('body-parser');
 
 // mongoose instance connection url connection

@@ -5,7 +5,8 @@ var sse = new SSE();
 
 var mongoose = require('mongoose'),
     User = mongoose.model('User'),
-    NodeSchema = mongoose.model('Node');
+    NodeSchema = mongoose.model('Node'),
+    ImageSchema = mongoose.model('Image');
 
 exports.create_user = function(req, res) {
     let user = new User({username: req.body.username,
@@ -66,6 +67,45 @@ exports.set_colors = function(req, res) {
             if (err) return res.json(err);
             res.json(user.colors);
         });
+    });
+}
+
+exports.set_image = function(req, res) {
+    if (req.user._id !== req.params.userId) {
+        return res.status(401).json("Not authorized.").end();
+    }
+    let query = User.findById(req.params.userId);
+    query.exec(function (err, user) {
+        /**
+         * TODO: handle errors better and respond with something that makes sense
+         */
+        if (err) return res.json(err);
+        if (!user) return res.status(404).end();
+
+        if (!req.file) return res.status(400).json("bad image").end();
+
+        let image = new ImageSchema({file: req.file});
+        image.save();
+        user.image = req.file.filename;
+        user.save(function (err, user) {
+            /**
+            * TODO: handle errors better and respond with something that makes sense
+            */
+            if (err) return res.json(err);
+            res.setHeader('Content-Type', image.file.mimetype);
+            res.sendFile('./uploads/' + user.image, {root: process.cwd()});
+        });
+    });
+}
+
+exports.get_image = function(req, res) {
+    ImageSchema.findOne({"file.filename": req.params.filename})
+    .exec(function(err, image) {
+        if (err) return res.json(err);
+        if (!image) return res.status(404).end();
+
+        res.setHeader('Content-Type', image.file.mimetype);
+        res.sendFile('./uploads/' + image.file.filename, {root: process.cwd()});
     });
 }
 
