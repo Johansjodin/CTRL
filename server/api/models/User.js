@@ -20,7 +20,6 @@ var UserSchema = new mongoose.Schema({
         required: [true, "can't be blank"],
         match: [/\S+@\S+\.\S+/, 'is invalid'],
         index: true}, */
-    bio: String,
     image: String,
 /*  hash: String,
     salt: String, */
@@ -56,7 +55,6 @@ UserSchema.methods.getProfile = function() {
     return {
         id: this._id,
         username: this.username,
-        bio: this.bio,
         image: this.image,
         colors: this.colors,
         createdAt: this.createdAt
