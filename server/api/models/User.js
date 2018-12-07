@@ -26,7 +26,7 @@ var UserSchema = new mongoose.Schema({
     colors: {
         type: [{ type: String, validate: [validateColor, 'not a valid color'] }],
         validate: [arrayLimit, '{PATH} must be 5'],
-        default: [["#e84b17", "#d3f237", "#37f175", "#3684f0", "#ec35ef"]]
+        default: ["#e84b17", "#d3f237", "#37f175", "#3684f0", "#ec35ef"]
     },
     admin: { type: Boolean, default: false },
     googleId: {type: String, unique: true, required: [true, "google id required"]},
