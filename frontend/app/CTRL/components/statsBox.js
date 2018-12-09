@@ -8,11 +8,7 @@ export const StatsBox = (props) => {
             <View style={styles.stats}>
                 <TouchableOpacity style={styles.statsBox} >
                     <Text style={styles.numberLarge}>{props.stats.current !== undefined && props.stats.current || 0}</Text>
-                    <Text style={styles.subtitle}>CURRENT</Text>
-                </TouchableOpacity >
-                <TouchableOpacity style={styles.statsBox}>
-                    <Text style={styles.numberLarge}>{props.stats.total !== undefined && props.stats.total || 0}</Text>
-                    <Text style={styles.subtitle}>TOTAL</Text>
+                    <Text style={styles.subtitle}>ZONES</Text>
                 </TouchableOpacity >
                 <TouchableOpacity style={styles.statsBox}>
                     <Text style={styles.numberLarge}>{props.stats.points !== undefined && props.stats.points || 0}</Text>

@@ -1,20 +1,34 @@
 import React from 'react';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, View, TouchableOpacity } from 'react-native';
 import { Text } from 'react-native-elements';
 import { RoundedBox } from '../components/roundedBox';
 
 export class ZoneList extends React.Component {
+    constructor(props) {
+        super(props);
+
+        this.state = {
+            zones: ['You do not control any zones']
+        }
+        
+        if (props.zones !== undefined && props.zones.length > 0) {
+            state.zones = props.zones;
+        }
+    }
+
+    componentWillReceiveProps(newProps) {
+        if (this.props.zones !== newProps.zones) {
+            this.setState({zones: newProps.zones})
+        }
+      }
+
     render() {
         return (
             <RoundedBox>
-                { (this.props.zones !== undefined && this.props.empty !== undefined) && this.props.zones.map((zone,index) => (
-                    <View style={styles.zone} key={index}>
-                        {this.props.empty ? (
-                            <Text> You do not currently control any zones. </Text>
-                        ) : (
-                            <Text style={styles.zoneName}>{zone}</Text>
-                        )}
-                    </View>
+                {this.state.zones.map((zone,index) => (
+                    <TouchableOpacity style={styles.zone} key={index}>
+                        <Text style={styles.zoneName}>{zone}</Text>
+                    </TouchableOpacity>
                 ))}
             </RoundedBox>
         );

@@ -7,7 +7,7 @@ import { StatsBox } from '../components/statsBox';
 import { ZoneList } from '../components/zoneList';
 import { IdentifierBox } from '../components/identifierBox';
 import { store } from '../components/store';
-import { getNodes } from '../api/api'
+import { getNodes, getUser } from '../api/api'
 import { SecureStore } from 'expo'
 const spacerSize = 1000;
 
@@ -15,45 +15,42 @@ export default class ProfileScreen extends React.Component {
     
     constructor(props) {
         super(props);
-        if(!store.hasOwnProperty('myNodes')){ store.myNodes = []; }
-        if(!store.hasOwnProperty('allNodes')){ store.allNodes = []; }
+        //if(!store.hasOwnProperty('myNodes')){ store.myNodes = []; }
         if(!store.hasOwnProperty('username')){ console.error(this.constructor.name+'::Error reading username from store.')}
-        if(!store.hasOwnProperty('colors')){ console.error(this.constructor.name+'::Error reading username from store.')}
+        if(!store.hasOwnProperty('colors')){ console.error(this.constructor.name+'::Error reading colors from store.')}
         this.state = {
             username: store.username,
             stats: {
-                current: 5,
-                total: 17,
-                points: 3200,  
+                current: 0,
+                points: 0,  
             },
             rank: 7,
-            categories: {
-                current: store.myNodes,
-                total: store.allNodes,
-            },
+            nodes: [],
             identifier: store.colors, //['#c62828', '#6a1b9a', '#283593', '#0277bd', '#00695c'],
         },
         this.handleSignOut = this.handleSignOut.bind(this);
     }
-    async updateNodes(){
+
+    async updateUserInfo(){
         let nodes = await getNodes();
-        let allNodes = [], myNodes = [];
-        for(let i=0; i<nodes.length; i++){
-            allNodes.push(nodes[i].name);
-            if(nodes[i].id == store.uid){
-                myNodes.push(nodes[i].name);
-            }
-        }
-        store.myNodes = myNodes;
-        store.allNodes = allNodes;
-        await this.setState({categories: { current: myNodes, total: allNodes}} );
+        let myNodes = nodes.filter(node => {
+            return node.owner === store.uid;
+        });
+
+        let userInfo = await getUser(store.uid);
+
+        //store.myNodes = myNodes;
+        this.setState({stats: {current: myNodes.length, points: userInfo.points}, nodes: myNodes});
+        console.log(store);
     }
+
     async componentDidMount() {
-        this.updateNodes();
+        this.updateUserInfo();
     }
 
     handleSignOut(){
         SecureStore.deleteItemAsync('jwt');
+        SecureStore.deleteItemAsync('uid');
         this.props.navigation.navigate('LoginScreen')
     }
 
@@ -71,7 +68,7 @@ export default class ProfileScreen extends React.Component {
                                 source={{uri: "https://s3.amazonaws.com/uifaces/faces/twitter/adhamdannaway/128.jpg"}}
                                 activeOpacity={0.7}
                             />
-                            <Text style={styles.username}>{this.state.username}</Text>
+                            <Text style={styles.username}>{this.state.username.toUpperCase()}</Text>
                         </View>
                         
                         <View style={styles.content}>
@@ -87,14 +84,12 @@ export default class ProfileScreen extends React.Component {
                                 <Text style={{color:'white', width: '100%', marginBottom: 15, marginLeft: 20}}>Identifier</Text>
                                 <IdentifierBox colors={this.state.identifier} />
 
-                                <Text style={{color:'white', width: '100%', marginBottom: 15, marginLeft: 20, marginTop: 50,}}>Controlled zones</Text>
-                                {store.myNodes.length==0 ? (
-                                    <ZoneList empty={true} zones={['']} />
-                                ) : (
-                                    <ZoneList empty={false} zones={this.state.categories.current} />
-                                )}
+                                <Text style={styles.zoneListLabel}>Controlled zones</Text>
+                                <ZoneList zones={this.state.nodes.map(node => {return node.name})} />
 
-                                
+                                <Text style={styles.zoneListLabel}>Previously controlled zones</Text>
+                                <ZoneList zones={this.state.nodes.map(node => {return node.name})} />
+
                                 <RoundedButton
                                     backgroundColor='#ff5555'
                                     title='Log out' 
@@ -155,7 +150,7 @@ const styles = StyleSheet.create({
     },
     username: {
         marginTop: 20,
-        fontSize: 28,
+        fontSize: 32,
         textAlign: 'center',
         color: '#2b3d53',
     },
@@ -179,7 +174,14 @@ const styles = StyleSheet.create({
     },
     rankLabel: {
         color: 'white',
-    }
+    },
+    zoneListLabel: {
+        color:'white', 
+        width: '100%', 
+        marginBottom: 15, 
+        marginLeft: 20, 
+        marginTop: 50
+    },
 });
 
 /** #737373 */

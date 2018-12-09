@@ -13,7 +13,7 @@ export default class nodeInfo extends React.Component {
 		return (
             <View style={styles.nodeInfo}>
                 <Text style={{fontSize: 18}}>Node: {this.props.nodeInfo.title}</Text>
-                <Text style={{fontSize: 18}}>Owner: {this.props.nodeInfo.owner}</Text>
+                <Text style={{fontSize: 18}}>Owner: {this.props.nodeInfo.ownerName}</Text>
                 <Text>Coordinates: {this.props.nodeInfo.coordinates.latitude}, {this.props.nodeInfo.coordinates.longitude}</Text>
                 <Text>Captured at: {this.props.nodeInfo.captured_at}</Text>
                 <IdentifierBox colors={this.props.nodeInfo.colors} />
@@ -32,5 +32,4 @@ const styles = StyleSheet.create({
         padding: 25,
         flexDirection: 'column',
     }
-    
 });
