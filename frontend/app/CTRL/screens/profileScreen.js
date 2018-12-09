@@ -23,8 +23,8 @@ export default class ProfileScreen extends React.Component {
             stats: {
                 current: 0,
                 points: 0,  
+                rank: 7,
             },
-            rank: 7,
             nodes: [],
             identifier: store.colors, //['#c62828', '#6a1b9a', '#283593', '#0277bd', '#00695c'],
         },
@@ -32,20 +32,32 @@ export default class ProfileScreen extends React.Component {
     }
 
     async updateUserInfo(){
-        let nodes = await getNodes();
+        /*let nodes = await getNodes();
         let myNodes = nodes.filter(node => {
             return node.owner === store.uid;
         });
 
-        let userInfo = await getUser(store.uid);
+        let userInfo = await getUser(store.uid);*/
 
         //store.myNodes = myNodes;
-        this.setState({stats: {current: myNodes.length, points: userInfo.points}, nodes: myNodes});
-        console.log(store);
+        
+        //this.setState({stats: {current: myNodes.length, points: userInfo.points}, nodes: myNodes});
+        store.rank = 1;
+        if (!store.hasOwnProperty('rank')) // temp maybe
+            store.rank = 1;
+
+        await this.setState({
+            stats: {
+                current: store.myNodes.length, 
+                points: store.points,
+                rank: store.rank,
+            }, 
+            nodes: store.myNodes
+        });
     }
 
     async componentDidMount() {
-        this.updateUserInfo();
+        await this.updateUserInfo();
     }
 
     handleSignOut(){
@@ -73,18 +85,12 @@ export default class ProfileScreen extends React.Component {
                         
                         <View style={styles.content}>
                             <StatsBox stats={this.state.stats}/>
-                            
-                            <View style={styles.rank}>
-                                <Text style={styles.rankNumber}>7</Text>
-                                <Text style={styles.rankLabel}>RANK</Text>
-                            </View>
-
                             <View style={styles.paddedContent}>
+                                <View style={{height: 1, width: '100%', backgroundColor: 'black', marginBottom: 25}}></View>
+                            
+                                <IdentifierBox colors={this.state.identifier} containercolor={'transparent'}/>
 
-                                <Text style={{color:'white', width: '100%', marginBottom: 15, marginLeft: 20}}>Identifier</Text>
-                                <IdentifierBox colors={this.state.identifier} />
-
-                                <Text style={styles.zoneListLabel}>Controlled zones</Text>
+                                <Text style={[styles.zoneListLabel, {marginTop: 25}]}>Controlled zones</Text>
                                 <ZoneList zones={this.state.nodes.map(node => {return node.name})} />
 
                                 <Text style={styles.zoneListLabel}>Previously controlled zones</Text>
@@ -125,8 +131,8 @@ const styles = StyleSheet.create({
     paddedContent: {
         width: '100%',
         alignItems: 'center',
-        paddingLeft: 35,
-        paddingRight: 35,
+        paddingLeft: 25,
+        paddingRight: 25,
     },
     header: {
         flex: 1,
@@ -162,19 +168,6 @@ const styles = StyleSheet.create({
         width: '100%',
         paddingBottom: 35,
     },
-    rank: {
-        padding: 15,
-        marginTop: 0,
-        marginBottom: 50,
-        alignItems: 'center',
-    },
-    rankNumber: {
-        fontSize: 70,
-        color: '#218b00',
-    },
-    rankLabel: {
-        color: 'white',
-    },
     zoneListLabel: {
         color:'white', 
         width: '100%', 
@@ -185,3 +178,4 @@ const styles = StyleSheet.create({
 });
 
 /** #737373 */
+/** <Text style={{color:'white', width: '100%', marginBottom: 15, marginLeft: 20}}>Identifier</Text> */

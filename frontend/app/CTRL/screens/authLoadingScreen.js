@@ -1,8 +1,9 @@
 import React from 'react';
 import { StyleSheet, View, StatusBar } from 'react-native';
 import {SecureStore} from "expo";
-import { getUser } from '../api/api';
+import { getUser, getNodes } from '../api/api';
 import { store } from '../components/store';
+
 
 export default class AuthLoadingScreen extends React.Component {
 
@@ -27,6 +28,13 @@ export default class AuthLoadingScreen extends React.Component {
             store.imageId = userInfo.image;
             store.uid = uid;
             store.points = userInfo.points
+
+            let nodes = await getNodes();
+            let myNodes = nodes.filter(node => {
+                return node.owner === uid;
+            });
+
+            store.myNodes = myNodes
             this.props.navigation.navigate('MapScreen');
         } else {
             this.props.navigation.navigate('LoginScreen');

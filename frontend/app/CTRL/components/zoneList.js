@@ -20,7 +20,7 @@ export class ZoneList extends React.Component {
         if (this.props.zones !== newProps.zones) {
             this.setState({zones: newProps.zones})
         }
-      }
+    }
 
     render() {
         return (

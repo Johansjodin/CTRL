@@ -9,33 +9,42 @@ export default class LoginScreen extends React.Component {
 
     constructor(props) {
         super(props);
-        this.state={showError:false, errorMessage:''}
+        this.state = {
+            showError:false,
+            errorMessage:'',
+        }
         this.handleSignIn = this.handleSignIn.bind(this);
         this.handleSignUp = this.handleSignUp.bind(this);
     }
 
     async handleSignIn() {
-        try {
-            let idToken = await signInWithGoogleAsync();
-            await signIn(idToken);
-            this.props.navigation.navigate('MapScreen');
+        let result = await signInWithGoogleAsync();
+        
+        if (result.cancelled) 
+            return;
 
-        } catch (e) {
-            console.log('loginScreen.js::'+e.message);
-            this.setState({showError:true, errorMessage: 'Sign in with Google failed. Do try again.'});
-            return; // TODO show something
+        if (result.error) {
+            this.setState({showError:true, errorMessage: 'Sign up with Google failed. Do try again.'});
+            return;
         }
+            
+        await signIn(result); // idToken
+        this.props.navigation.navigate('MapScreen');
     }
 
     async handleSignUp() {
-        try {
-            let idToken = await signInWithGoogleAsync();
-            this.props.navigation.navigate('RegisterScreen', {idToken: idToken});
+        let result = await signInWithGoogleAsync();
+        
+        if (result.cancelled) 
+            return;
 
-        } catch (e) {
+        if (result.error) {
             this.setState({showError:true, errorMessage: 'Sign in with Google failed. Do try again.'});
-            return; // TODO show something
+            return;
         }
+
+        await signIn(result); // idToken
+        this.props.navigation.navigate('RegisterScreen', {idToken: result});
     }
 
 	render() {
