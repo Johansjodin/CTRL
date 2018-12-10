@@ -184,7 +184,11 @@ exports.stream_events = function(req, res) {
 };
 
 exports.test_event = function(req, res) {
-    sse.send({colors: ["a","b","c"]}, 'colorchange');
+    User.findById("5c07d3fa2aa8a250cb77f74e")
+    .exec(function(err, user) {
+        if (err) return res.json(err);
+        updateNodes(user);
+    })
     res.json("ty");
 };
 
