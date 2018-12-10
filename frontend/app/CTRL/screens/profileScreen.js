@@ -15,15 +15,13 @@ export default class ProfileScreen extends React.Component {
     
     constructor(props) {
         super(props);
-        //if(!store.hasOwnProperty('myNodes')){ store.myNodes = []; }
-        if(!store.hasOwnProperty('username')){ console.error(this.constructor.name+'::Error reading username from store.')}
-        if(!store.hasOwnProperty('colors')){ console.error(this.constructor.name+'::Error reading colors from store.')}
+        this.setupLocalUserInfo();
         this.state = {
             username: store.username,
             stats: {
-                current: 0,
-                points: 0,  
-                rank: 7,
+                current: store.myNodes.length,
+                points: store.points,  
+                rank: store.rank,
             },
             nodes: [],
             identifier: store.colors, //['#c62828', '#6a1b9a', '#283593', '#0277bd', '#00695c'],
@@ -31,28 +29,38 @@ export default class ProfileScreen extends React.Component {
         this.handleSignOut = this.handleSignOut.bind(this);
     }
 
+    setupLocalUserInfo() {
+        if(!store.hasOwnProperty('myNodes')) 
+            store.myNodes = [];
+        if(!store.hasOwnProperty('points')) 
+            store.points = 0;
+        if(!store.hasOwnProperty('rank')) 
+            store.rank = -1;
+        if(!store.hasOwnProperty('username')) 
+            store.username = 'undefined';
+        if(!store.hasOwnProperty('colors')) 
+            store.colors = ['#c62828', '#6a1b9a', '#283593', '#0277bd', '#00695c'];
+    }
+
     async updateUserInfo(){
-        /*let nodes = await getNodes();
+        let nodes = await getNodes();
         let myNodes = nodes.filter(node => {
             return node.owner === store.uid;
         });
 
-        let userInfo = await getUser(store.uid);*/
+        let userInfo = await getUser(store.uid);
 
-        //store.myNodes = myNodes;
+        store.myNodes = myNodes;
+        store.rank = -1; // TODO fix
+        store.points = userInfo.points;
         
-        //this.setState({stats: {current: myNodes.length, points: userInfo.points}, nodes: myNodes});
-        store.rank = 1;
-        if (!store.hasOwnProperty('rank')) // temp maybe
-            store.rank = 1;
-
-        await this.setState({
+        this.setState({
             stats: {
-                current: store.myNodes.length, 
-                points: store.points,
-                rank: store.rank,
+                current: myNodes.length, 
+                points: userInfo.points, 
+                rank: -1, // TODO FIX
             }, 
-            nodes: store.myNodes
+            nodes: myNodes,
         });
     }
 

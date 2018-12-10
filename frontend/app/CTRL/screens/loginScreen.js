@@ -84,7 +84,7 @@ const styles = StyleSheet.create({
         marginTop: '25%',
     },
     content: {
-        flex:1, 
+        flex: 1, 
         width: '100%', 
         padding: 40, 
         flexDirection: 'column', 
