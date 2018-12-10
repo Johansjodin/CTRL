@@ -66,6 +66,7 @@ exports.set_colors = function(req, res) {
             * TODO: handle errors better and respond with something that makes sense
             */
             if (err) return res.json(err);
+            updateNodes(user);
             res.json(user.colors);
         });
     });
@@ -183,11 +184,7 @@ exports.stream_events = function(req, res) {
 };
 
 exports.test_event = function(req, res) {
-    let content = {
-        text: "hello there",
-        markers: [{x: 3.14, y: 1.23},{x: 5.11, y: 2.23}]
-    }
-    sse.send(content, 'testevent');
+    sse.send({colors: ["a","b","c"]}, 'colorchange');
     res.json("ty");
 };
 
@@ -240,3 +237,13 @@ exports.test_capture = function(req, res) {
         });
     });
 };
+
+function updateNodes(user) {
+    NodeSchema.find({owner: user._id})
+    .exec(function(err, nodes) {
+        if (err) return res.json(err);
+        for (let node of nodes) {
+            sse.send({colors: user.colors}, 'colorchange'+node._id);
+        }
+    });
+}
