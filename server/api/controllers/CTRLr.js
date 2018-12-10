@@ -37,6 +37,15 @@ exports.get_user = function(req, res) {
     });
 };
 
+exports.get_leaderboard = function (req, res) {
+    User.find().sort({points: -1}).limit(100)
+    .select('-salt -hash -admin -updatedAt -__v -googleId')
+    .exec(function(err, users) {
+        if (err) return res.json(err);
+        res.json(users);
+    });
+}
+
 exports.login = function(req, res) {
     let query = User.findOne({googleId: req.googleId});
 

@@ -12,6 +12,9 @@ module.exports = function(app) {
     app.route('/users')
         .post(ctrl.create_user);
 
+    app.route('/leaderboards')
+        .get(ctrl.get_leaderboard);
+
     app.route('/users/:userId')
         .get(ctrl.get_user);
 
