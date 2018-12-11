@@ -3,7 +3,7 @@ import { StyleSheet, View} from 'react-native';
 import MapView, { PROVIDER_GOOGLE } from 'react-native-maps';
 import Navbar from '../components/navbar';
 import NodeInfo from '../components/nodeInfo';
-import { getNodes, getColor } from '../api/api';
+import { getNodes, getColor, getUser } from '../api/api';
 import { SecureStore } from 'expo';
 import { store } from '../components/store'
 
@@ -50,9 +50,9 @@ export default class LoginScreen extends React.Component {
 
         this.setState({
             "selectedNode": {
-                'key':  node.key,
                 'title': node.title,
                 'owner': node.owner,
+                'ownerName': node.ownerName,
                 "coordinates": {
                     "latitude": node.coordinates.latitude,
                     "longitude": node.coordinates.longitude,
@@ -66,11 +66,13 @@ export default class LoginScreen extends React.Component {
 
     async componentDidMount() {
         let nodes = await getNodes();
-        let convertedNodes = nodes.map(node => {
+        let convertedNodes = nodes.map(async node => {
+            let username = (await getUser(node.owner)).username;
             return {
                 key: node._id,
                 title: node.name,
                 owner: node.owner,
+                ownerName: username,
                 coordinates: {
                     latitude: node.coordinates[0],
                     longitude: node.coordinates[1],
@@ -78,6 +80,7 @@ export default class LoginScreen extends React.Component {
                 captured_at: node.captured_at
             }
         });
+        convertedNodes = await Promise.all(convertedNodes);
 
         this.setState({
             nodes: [...convertedNodes]
@@ -96,9 +99,9 @@ export default class LoginScreen extends React.Component {
                     showsPointsOfInterest
                     onPress={this.hideNodeInfo}
                 >
-                    {this.state.nodes.map(node => (
+                    {this.state.nodes.map((node, i) => (
                         <MapView.Marker
-                            key={node.key}
+                            key={i}
                             coordinate={node.coordinates}
                             onPress={() => {this.nodeClick(node)}}
                         />

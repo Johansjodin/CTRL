@@ -7,7 +7,7 @@ import { StatsBox } from '../components/statsBox';
 import { ZoneList } from '../components/zoneList';
 import { IdentifierBox } from '../components/identifierBox';
 import { store } from '../components/store';
-import { getNodes } from '../api/api'
+import { getNodes, getUser } from '../api/api'
 import { SecureStore } from 'expo'
 const spacerSize = 1000;
 
@@ -15,45 +15,62 @@ export default class ProfileScreen extends React.Component {
     
     constructor(props) {
         super(props);
-        if(!store.hasOwnProperty('myNodes')){ store.myNodes = []; }
-        if(!store.hasOwnProperty('allNodes')){ store.allNodes = []; }
-        if(!store.hasOwnProperty('username')){ console.error(this.constructor.name+'::Error reading username from store.')}
-        if(!store.hasOwnProperty('colors')){ console.error(this.constructor.name+'::Error reading username from store.')}
+        this.setupLocalUserInfo();
         this.state = {
             username: store.username,
             stats: {
-                current: 5,
-                total: 17,
-                points: 3200,  
+                current: store.myNodes.length,
+                points: store.points,  
+                rank: store.rank,
             },
-            rank: 7,
-            categories: {
-                current: store.myNodes,
-                total: store.allNodes,
-            },
+            nodes: [],
             identifier: store.colors, //['#c62828', '#6a1b9a', '#283593', '#0277bd', '#00695c'],
         },
         this.handleSignOut = this.handleSignOut.bind(this);
     }
-    async updateNodes(){
-        let nodes = await getNodes();
-        let allNodes = [], myNodes = [];
-        for(let i=0; i<nodes.length; i++){
-            allNodes.push(nodes[i].name);
-            if(nodes[i].id == store.uid){
-                myNodes.push(nodes[i].name);
-            }
-        }
-        store.myNodes = myNodes;
-        store.allNodes = allNodes;
-        await this.setState({categories: { current: myNodes, total: allNodes}} );
+
+    setupLocalUserInfo() {
+        if(!store.hasOwnProperty('myNodes')) 
+            store.myNodes = [];
+        if(!store.hasOwnProperty('points')) 
+            store.points = 0;
+        if(!store.hasOwnProperty('rank')) 
+            store.rank = -1;
+        if(!store.hasOwnProperty('username')) 
+            store.username = 'undefined';
+        if(!store.hasOwnProperty('colors')) 
+            store.colors = ['#c62828', '#6a1b9a', '#283593', '#0277bd', '#00695c'];
     }
+
+    async updateUserInfo(){
+        let nodes = await getNodes();
+        let myNodes = nodes.filter(node => {
+            return node.owner === store.uid;
+        });
+
+        let userInfo = await getUser(store.uid);
+
+        store.myNodes = myNodes;
+        store.rank = -1; // TODO fix
+        store.points = userInfo.points;
+        
+        this.setState({
+            stats: {
+                current: myNodes.length, 
+                points: userInfo.points, 
+                rank: -1, // TODO FIX
+            }, 
+            nodes: myNodes,
+        });
+    }
+
     async componentDidMount() {
-        this.updateNodes();
+        await this.updateUserInfo();
     }
 
     handleSignOut(){
         SecureStore.deleteItemAsync('jwt');
+        SecureStore.deleteItemAsync('uid');
         this.props.navigation.navigate('LoginScreen')
     }
 
@@ -71,30 +88,22 @@ export default class ProfileScreen extends React.Component {
                                 source={{uri: "https://s3.amazonaws.com/uifaces/faces/twitter/adhamdannaway/128.jpg"}}
                                 activeOpacity={0.7}
                             />
-                            <Text style={styles.username}>{this.state.username}</Text>
+                            <Text style={styles.username}>{this.state.username.toUpperCase()}</Text>
                         </View>
                         
                         <View style={styles.content}>
                             <StatsBox stats={this.state.stats}/>
-                            
-                            <View style={styles.rank}>
-                                <Text style={styles.rankNumber}>7</Text>
-                                <Text style={styles.rankLabel}>RANK</Text>
-                            </View>
-
                             <View style={styles.paddedContent}>
+                                <View style={{height: 1, width: '100%', backgroundColor: 'black', marginBottom: 25}}></View>
+                            
+                                <IdentifierBox colors={this.state.identifier} containercolor={'transparent'}/>
 
-                                <Text style={{color:'white', width: '100%', marginBottom: 15, marginLeft: 20}}>Identifier</Text>
-                                <IdentifierBox colors={this.state.identifier} />
+                                <Text style={[styles.zoneListLabel, {marginTop: 25}]}>Controlled zones</Text>
+                                <ZoneList zones={this.state.nodes.map(node => {return node.name})} />
 
-                                <Text style={{color:'white', width: '100%', marginBottom: 15, marginLeft: 20, marginTop: 50,}}>Controlled zones</Text>
-                                {store.myNodes.length==0 ? (
-                                    <ZoneList empty={true} zones={['']} />
-                                ) : (
-                                    <ZoneList empty={false} zones={this.state.categories.current} />
-                                )}
+                                <Text style={styles.zoneListLabel}>Previously controlled zones</Text>
+                                <ZoneList zones={this.state.nodes.map(node => {return node.name})} />
 
-                                
                                 <RoundedButton
                                     backgroundColor='#ff5555'
                                     title='Log out' 
@@ -130,8 +139,8 @@ const styles = StyleSheet.create({
     paddedContent: {
         width: '100%',
         alignItems: 'center',
-        paddingLeft: 35,
-        paddingRight: 35,
+        paddingLeft: 25,
+        paddingRight: 25,
     },
     header: {
         flex: 1,
@@ -155,7 +164,7 @@ const styles = StyleSheet.create({
     },
     username: {
         marginTop: 20,
-        fontSize: 28,
+        fontSize: 32,
         textAlign: 'center',
         color: '#2b3d53',
     },
@@ -167,19 +176,14 @@ const styles = StyleSheet.create({
         width: '100%',
         paddingBottom: 35,
     },
-    rank: {
-        padding: 15,
-        marginTop: 0,
-        marginBottom: 50,
-        alignItems: 'center',
+    zoneListLabel: {
+        color:'white', 
+        width: '100%', 
+        marginBottom: 15, 
+        marginLeft: 20, 
+        marginTop: 50
     },
-    rankNumber: {
-        fontSize: 70,
-        color: '#218b00',
-    },
-    rankLabel: {
-        color: 'white',
-    }
 });
 
 /** #737373 */
+/** <Text style={{color:'white', width: '100%', marginBottom: 15, marginLeft: 20}}>Identifier</Text> */

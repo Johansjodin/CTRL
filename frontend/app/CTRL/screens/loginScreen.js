@@ -1,56 +1,50 @@
 import React from 'react';
 import { StyleSheet, View, Image, StatusBar } from 'react-native';
 import { RoundedButton } from '../components/roundedButton';
-import EmergencyBar from '../components/EmergencyBar';
+import { EmergencyBar } from '../components/EmergencyBar';
 import { signIn, signInWithGoogleAsync } from '../api/api';
-import {SecureStore} from "expo";
-import NodeInfo from "../components/nodeInfo";
+import { SecureStore } from "expo";
 
 export default class LoginScreen extends React.Component {
 
     constructor(props) {
         super(props);
-        this.state={showError:false, errorMessage:''}
+        this.state = {
+            showError:false,
+            errorMessage:'',
+        }
         this.handleSignIn = this.handleSignIn.bind(this);
         this.handleSignUp = this.handleSignUp.bind(this);
     }
 
-    async componentDidMount() {
-        StatusBar.setHidden(true);
-        let token = await SecureStore.getItemAsync('jwt');
-        if(token != undefined){
-            try{
-                await signIn(token);  // TODO: fix this
-                this.props.navigation.navigate('MapScreen');
-            } catch (e) {
-                console.log('loginScreen.js::'+e.message);
-                this.setState({showError:true, errorMessage: 'Auto-Sign in failed. Manual login required.'});
-            }
-        }
-    }
-
     async handleSignIn() {
-        try {
-            let idToken = await signInWithGoogleAsync();
-            await signIn(idToken);
-            this.props.navigation.navigate('MapScreen');
+        let result = await signInWithGoogleAsync();
+        
+        if (result.cancelled) 
+            return;
 
-        } catch (e) {
-            console.log('loginScreen.js::'+e.message);
-            this.setState({showError:true, errorMessage: 'Sign in with Google failed. Do try again.'});
-            return; // TODO show something
+        if (result.error) {
+            this.setState({showError:true, errorMessage: 'Sign up with Google failed. Do try again.'});
+            return;
         }
+            
+        await signIn(result); // idToken
+        this.props.navigation.navigate('MapScreen');
     }
 
     async handleSignUp() {
-        try {
-            let idToken = await signInWithGoogleAsync();
-            this.props.navigation.navigate('RegisterScreen', {idToken: idToken});
+        let result = await signInWithGoogleAsync();
+        
+        if (result.cancelled) 
+            return;
 
-        } catch (e) {
+        if (result.error) {
             this.setState({showError:true, errorMessage: 'Sign in with Google failed. Do try again.'});
-            return; // TODO show something
+            return;
         }
+
+        await signIn(result); // idToken
+        this.props.navigation.navigate('RegisterScreen', {idToken: result});
     }
 
 	render() {
@@ -90,7 +84,7 @@ const styles = StyleSheet.create({
         marginTop: '25%',
     },
     content: {
-        flex:1, 
+        flex: 1, 
         width: '100%', 
         padding: 40, 
         flexDirection: 'column', 

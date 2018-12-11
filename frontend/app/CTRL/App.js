@@ -3,6 +3,7 @@ import LoginScreen from './screens/loginScreen';
 import MapScreen from './screens/mapScreen';
 import ProfileScreen from './screens/profileScreen';
 import RegisterScreen from './screens/registerScreen';
+import AuthLoadingScreen from  './screens/authLoadingScreen';
 import CaptureScreen from  './screens/captureScreen';
 import { createStackNavigator, createAppContainer, createSwitchNavigator } from 'react-navigation';
 
@@ -58,8 +59,12 @@ const AppStack = createStackNavigator(
 const App = createAppContainer(
     createSwitchNavigator(
         {
+            AuthLoad: AuthLoadingScreen,
             Auth: AuthStack,
             App: AppStack,
+        },
+        {
+            initialRouteName: "AuthLoad",
         }
     )
 );

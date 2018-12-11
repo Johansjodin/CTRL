@@ -47,7 +47,7 @@ export default class RegisterScreen extends React.Component {
             this.props.navigation.navigate('MapScreen');
 
         } catch (err) {
-            console.log("loginScreen.js::Error signing in:"+err.message)
+            console.log("registerscreen.js::Error signing in:"+err.message)
             return; // TODO show something
         }
 	}

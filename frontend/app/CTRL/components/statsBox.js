@@ -2,25 +2,51 @@ import React from 'react';
 import { StyleSheet, View, TouchableOpacity  } from 'react-native';
 import { Text } from 'react-native-elements';
 
-export const StatsBox = (props) => {
-    return (
-        <View style={styles.statsWrapper}>
-            <View style={styles.stats}>
-                <TouchableOpacity style={styles.statsBox} >
-                    <Text style={styles.numberLarge}>{props.stats.current !== undefined && props.stats.current || 0}</Text>
-                    <Text style={styles.subtitle}>CURRENT</Text>
-                </TouchableOpacity >
-                <TouchableOpacity style={styles.statsBox}>
-                    <Text style={styles.numberLarge}>{props.stats.total !== undefined && props.stats.total || 0}</Text>
-                    <Text style={styles.subtitle}>TOTAL</Text>
-                </TouchableOpacity >
-                <TouchableOpacity style={styles.statsBox}>
-                    <Text style={styles.numberLarge}>{props.stats.points !== undefined && props.stats.points || 0}</Text>
-                    <Text style={styles.subtitle}>POINTS</Text>
-                </TouchableOpacity >
+export class StatsBox extends React.Component {
+
+    constructor(props) {
+        super(props);
+
+        this.state = {
+            rank: props.stats.rank,
+            rankColor: '#23A6D5',
+        }
+        console.log(this.state.rankColor);
+    }
+
+    async componentWillReceiveProps(newProps) {
+        if (this.props.stats.rank !== newProps.stats.rank) {
+            console.log(newProps.stats.rank === 1);
+            
+            if (newProps.stats.rank <= 10)
+                await this.setState({rankColor: '#00B233'})
+            if (newProps.stats.rank === 1)
+                await this.setState({rankColor: 'gold'})
+            console.log(newProps);
+        }
+        
+    }
+
+    render() {
+        return (
+            <View style={styles.statsWrapper}>
+                <View style={styles.stats}>
+                    <TouchableOpacity style={styles.statsBox} >
+                        <Text style={styles.numberLarge}>{this.props.stats.current || 0}</Text>
+                        <Text style={styles.subtitle}>ZONES</Text>
+                    </TouchableOpacity >
+                    <TouchableOpacity style={styles.statsBox}>
+                        <Text style={styles.numberLarge}>{this.props.stats.points || 0}</Text>
+                        <Text style={styles.subtitle}>POINTS</Text>
+                    </TouchableOpacity >
+                    <TouchableOpacity style={styles.statsBox}>
+                        <Text style={[styles.numberLarge, {color: this.state.rankColor}]}>{this.props.stats.rank || 0}</Text>
+                        <Text style={styles.subtitle}>RANK</Text>
+                    </TouchableOpacity >
+                </View>
             </View>
-        </View>
-    );
+        );
+    }
 }
 
 const styles = StyleSheet.create({
