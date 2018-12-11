@@ -18,27 +18,31 @@ export default class AuthLoadingScreen extends React.Component {
     }
 
     async verifyToken() {
-        const token = await SecureStore.getItemAsync('jwt');
-        const uid = await SecureStore.getItemAsync('uid');
-        
-        if (token && uid) {
-            let userInfo = await getUser(uid);
-            store.username = userInfo.username; // TODO lite annorlunda mot andra apierna, ändra när det läggs in i store?
-            store.colors = userInfo.colors;
-            store.imageId = userInfo.image;
-            store.uid = uid;
-            store.points = userInfo.points
+        try{
+            const token = await SecureStore.getItemAsync('jwt');
+            const uid = await SecureStore.getItemAsync('uid');
+            if (token && uid) {
+                let userInfo = await getUser(uid);
+                store.username = userInfo.username; // TODO lite annorlunda mot andra apierna, ändra när det läggs in i store?
+                store.colors = userInfo.colors;
+                store.imageId = userInfo.image;
+                store.uid = uid;
+                store.points = userInfo.points
 
-            let nodes = await getNodes();
-            let myNodes = nodes.filter(node => {
-                return node.owner === uid;
-            });
+                let nodes = await getNodes();
+                let myNodes = nodes.filter(node => {
+                    return node.owner === uid;
+                });
 
-            store.myNodes = myNodes
-            this.props.navigation.navigate('MapScreen');
-        } else {
+                store.myNodes = myNodes
+                this.props.navigation.navigate('MapScreen');
+            } else {
+                throw new Error('Go to login screen.');
+            }
+        } catch (e) {
             this.props.navigation.navigate('LoginScreen');
         }
+
     };
 
 	render() {

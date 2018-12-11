@@ -36,7 +36,7 @@ export default class Navbar extends React.Component {
                 />
                 <Button
                     icon={{
-                        name: 'camera',
+                        name: 'memory',
                         size: 35,
                         color: this.props.active === 'capture' ? '#23A6D5' : 'black',
                         style: { marginRight: 0 }

@@ -1,14 +1,16 @@
 import React from 'react';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, View, TouchableOpacity } from 'react-native';
 
 export const IdentifierRow = (props) => {
     return (
         <View style={styles.horizontal}>
             {props.colors.map((color, index) => (
-                <View 
-                    style={[styles.round, {backgroundColor: color}]}
-                    key={index}
-                />
+                <TouchableOpacity onPress={() => {props.onPress(index)}} key={index}>
+                    <View
+                        style={[styles.round, {backgroundColor: color}]}
+                        key={index}
+                    />
+                </TouchableOpacity>
             ))}
         </View>
     );

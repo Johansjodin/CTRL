@@ -9,6 +9,13 @@ export async function getNodes() {
     let responseJson = await response.json();
     return responseJson;
 }
+export async function getNodesBy(userId) {
+    let response = await fetch(
+        'https://api.ctrl.nu/nodes/'+userId,
+    );
+    let responseJson = await response.json();
+    return responseJson;
+}
 
 export async function getUser(userId) {
     let response = await fetch(
@@ -55,7 +62,7 @@ export async function signIn(tokenId) {
     });
 
     let responseJson = await response.json();
-    console.log(responseJson);
+
     store.uid = responseJson.user.id;
     store.username = responseJson.user.username;
     store.colors = responseJson.user.colors;
@@ -94,7 +101,7 @@ export async function getColor(userId, tokenId) {
     return responseJson;
 }
 export async function setColor(userId, tokenId, colors) {
-    await fetch('https://api.ctrl.nu/users/'+userId+'/colors', {
+    let response = await fetch('https://api.ctrl.nu/users/'+userId+'/colors', {
         method: 'POST',
         headers: {
             'Accept': 'application/json',
@@ -105,4 +112,28 @@ export async function setColor(userId, tokenId, colors) {
             'colors': colors,
         }),
     });
+    let responseJson = await response.json();
+    return responseJson;
+}
+export async function setImage(userId, tokenId, image){
+    let response = await fetch('https://api.ctrl.nu/users/'+userId+'/image', {
+        method:'POST',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + tokenId,
+        },
+        body: JSON.stringify({
+            'avatar': image,
+        })
+    });
+    let responseJson = await response.json();
+    return responseJson;
+}
+export async function getLeaderboard(userId) {
+    let response = await fetch(
+        'https://api.ctrl.nu/nodes/leaderboards',
+    );
+    let responseJson = await response.json();
+    return responseJson;
 }

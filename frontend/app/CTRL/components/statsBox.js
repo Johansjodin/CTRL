@@ -11,7 +11,6 @@ export class StatsBox extends React.Component {
             rank: props.stats.rank,
             rankColor: '#23A6D5',
         }
-        console.log(this.state.rankColor);
     }
 
     async componentWillReceiveProps(newProps) {
