@@ -22,7 +22,6 @@ export async function signUp(tokenId, username) {
             'username': username,
         }),
     });
-
     let responseJson = await response.json();
 
     store.uid = responseJson.user.id;

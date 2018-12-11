@@ -42,7 +42,7 @@ export default class RegisterScreen extends React.Component {
 
 	async handleSubmit(e) {
         try {
-            await signUp(this.tokenId);
+            await signUp(this.tokenId, this.state.username);
             // SAVE TO FILE or something
             this.props.navigation.navigate('MapScreen');
 
