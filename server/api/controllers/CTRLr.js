@@ -87,9 +87,31 @@ exports.set_image = function(req, res) {
     }
     let query = User.findById(req.params.userId);
     query.exec(function (err, user) {
-        /**
-         * TODO: handle errors better and respond with something that makes sense
-         */
+
+        if (err) return res.json(err);
+        if (!user) return res.status(404).end();
+
+        if (!req.body.avatar) return res.status(400).json("bad image").end();
+
+        let image = new ImageSchema({file: req.body.avatar});
+        image.save();
+        user.image = req.body.avatar;
+        user.save(function (err, user) {
+
+            if (err) return res.json(err);
+            res.json(user.image);
+        });
+    });
+}
+
+/* with multi form data
+exports.set_image = function(req, res) {
+    if (req.user._id !== req.params.userId) {
+        return res.status(401).json("Not authorized.").end();
+    }
+    let query = User.findById(req.params.userId);
+    query.exec(function (err, user) {
+
         if (err) return res.json(err);
         if (!user) return res.status(404).end();
 
@@ -99,15 +121,13 @@ exports.set_image = function(req, res) {
         image.save();
         user.image = req.file.filename;
         user.save(function (err, user) {
-            /**
-            * TODO: handle errors better and respond with something that makes sense
-            */
+
             if (err) return res.json(err);
             res.setHeader('Content-Type', image.file.mimetype);
             res.sendFile('./uploads/' + user.image, {root: process.cwd()});
         });
     });
-}
+} */
 
 exports.get_image = function(req, res) {
     ImageSchema.findOne({"file.filename": req.params.filename})
