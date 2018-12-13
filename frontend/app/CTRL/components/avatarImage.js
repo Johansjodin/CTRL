@@ -17,7 +17,6 @@ export class AvatarImage extends React.Component{
     }
 
     async showPicturesDialog() {
-        console.log(this.props.isEditing);
         if (this.props.isEditing) {
             await this.setState({visible: true});
         }
@@ -49,7 +48,7 @@ export class AvatarImage extends React.Component{
                     <DialogContent
                         style={styles.content}>
                         {pictureLib.map((url, index) => (
-                            <TouchableOpacity style={styles.avatarContainerSmall} onPress={() => {this.setPicture(index)}}>
+                            <TouchableOpacity style={styles.avatarContainerSmall} onPress={() => {this.setPicture(index)}} key={index}>
                                 <Avatar
                                     avatarStyle={styles.avatarSmall}
                                     containerStyle={styles.avatarContainerSmall}

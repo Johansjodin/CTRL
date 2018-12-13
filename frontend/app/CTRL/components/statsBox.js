@@ -15,13 +15,13 @@ export class StatsBox extends React.Component {
 
     async componentWillReceiveProps(newProps) {
         if (this.props.stats.rank !== newProps.stats.rank) {
-            console.log(newProps.stats.rank === 1);
+            //console.log(newProps.stats.rank === 1);
             
             if (newProps.stats.rank <= 10)
                 await this.setState({rankColor: '#00B233'})
             if (newProps.stats.rank === 1)
                 await this.setState({rankColor: 'gold'})
-            console.log(newProps);
+            //console.log(newProps);
         }
         
     }

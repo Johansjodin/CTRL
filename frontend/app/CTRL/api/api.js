@@ -41,11 +41,7 @@ export async function signUp(tokenId, username) {
     let responseJson = await response.json();
     store.uid = responseJson.user.id;
     store.username = responseJson.user.username;
-    store.colors = responseJson.user.colors;
     store.points = responseJson.user.points;
-    if (JSON.stringify(responseJson.user.colors) == '[]') { // TODO Make a better check! (why string?)
-        await setColor(responseJson.user.id, responseJson.token, ['#001100', '#002200', '#003300', '#004400', '#005500'])
-    }
     await SecureStore.setItemAsync('uid', responseJson.user.id);
     await SecureStore.setItemAsync('jwt', JSON.stringify(responseJson.token));
     return responseJson;
@@ -62,11 +58,12 @@ export async function signIn(tokenId) {
     });
 
     let responseJson = await response.json();
-
+    store.pic = responseJson.user.image;
     store.uid = responseJson.user.id;
     store.username = responseJson.user.username;
     store.colors = responseJson.user.colors;
     store.pointw = responseJson.user.points;
+    store.token = JSON.stringify(responseJson.token);
     await SecureStore.setItemAsync('uid', responseJson.user.id);
     await SecureStore.setItemAsync('jwt', JSON.stringify(responseJson.token));
 }
@@ -106,7 +103,7 @@ export async function setColor(userId, tokenId, colors) {
         headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
-            'Authorization': 'Bearer ' + tokenId,
+            'Authorization': 'Bearer ' + JSON.parse(tokenId),
         },
         body: JSON.stringify({
             'colors': colors,
@@ -121,11 +118,11 @@ export async function setImage(userId, tokenId, image){
         headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
-            'Authorization': 'Bearer ' + tokenId,
+            'Authorization': 'Bearer ' + JSON.parse(tokenId),
         },
         body: JSON.stringify({
             'avatar': image,
-        })
+        }),
     });
     let responseJson = await response.json();
     return responseJson;

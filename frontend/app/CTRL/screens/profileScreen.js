@@ -21,7 +21,6 @@ export default class ProfileScreen extends React.Component {
         this.setupLocalUserInfo();
         this.state = {
             isEditing: false,
-            editProfilePicture:false,
             picture: store.pic,
             username: store.username,
             stats: {
@@ -34,9 +33,6 @@ export default class ProfileScreen extends React.Component {
             identifier: store.colors, //['#c62828', '#6a1b9a', '#283593', '#0277bd', '#00695c'],
         },
         this.handleSignOut = this.handleSignOut.bind(this);
-        this.showPicturesDialog = this.showPicturesDialog.bind(this);
-        this.setPicture = this.setPicture.bind(this);
-        this.closePicturesDialog = this.closePicturesDialog.bind(this);
     }
 
     setupLocalUserInfo() {
@@ -84,22 +80,6 @@ export default class ProfileScreen extends React.Component {
         SecureStore.deleteItemAsync('uid');
         this.props.navigation.navigate('LoginScreen');
     }
-
-    async showPicturesDialog() {
-        if (this.state.isEditing) {
-            await this.setState({editProfilePicture: true});
-        }
-    }
-    async setPicture(picture){
-        store.pic = pictureLib[picture];
-        this.forceUpdate();
-    }
-    async closePicturesDialog(){
-        let tokenId = await SecureStore.getItemAsync('jwt');
-        await setImage(store.uid, tokenId, store.pic);
-        await this.setState({editProfilePicture:false});
-    }
-
 	render() {
 		return (
             <View style={{flex: 1}}>
