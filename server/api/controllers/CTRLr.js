@@ -245,8 +245,6 @@ exports.test_event = function(req, res) {
 exports.test_capture = async function(req, res) {
     let prevOwner;
     let timestamp = new Date();
-    let points;
-    let newOwner;
     let node = await NodeSchema.findById(req.body.nodeId)
     .exec(function (err, node) {
         if (err) return res.json(err);
@@ -271,7 +269,7 @@ exports.test_capture = async function(req, res) {
     await ce.save(function (err, ce) {
         if (err) return res.json(err);
     });
-    points = node.getValue(node.secondsSinceCapture(timestamp));
+    let points = node.getValue(node.secondsSinceCapture(timestamp));
     NodeSchema.findByIdAndUpdate(req.body.nodeId,
                                 { $set: { owner: newOwner._id,
                                           captured_at: timestamp }},{ new: true })
