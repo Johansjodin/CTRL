@@ -242,40 +242,36 @@ exports.test_event = function(req, res) {
     res.json("ty");
 };
 
-exports.test_capture = function(req, res) {
+exports.test_capture = async function(req, res) {
     let prevOwner;
     let timestamp = new Date();
     let points;
-    let ce;
     let newOwner;
-    NodeSchema.findById(req.body.nodeId)
+    let node = await NodeSchema.findById(req.body.nodeId)
     .exec(function (err, node) {
         if (err) return res.json(err);
         if (!node) return res.status(404).end();
 
         prevOwner = node.owner;
-        User.findOne({cardId: req.body.cardId})
-        .exec(function (err, user) {
-            if (err) return res.json(err);
-            if (!user) return res.status(404).end();
-            newOwner = user;
-        });
-        points = node.getValue(node.secondsSinceCapture(timestamp));
-        ce = new CaptureEvent({ node: req.body.nodeId,
-                                    prevOwner: prevOwner,
-                                    newOwner: newOwner,
-                                    captured_at: timestamp,
-                                    points: points});
-        ce.save(function (err, ce) {
-            /**
-            * TODO: handle errors better and respond with something that makes sense
-            */
-            if (err) return res.json(err);
-        });
+        return node;
     });
-    /**
-     * for some reason save doesnt work so gotta do this
-     */
+    let newOwner = await User.findOne({cardId: req.body.cardId})
+    .exec(function (err, user) {
+        if (err) return res.json(err);
+        if (!user) return res.status(404).end();
+        return user;
+    });
+
+    let ce = new CaptureEvent({ node: req.body.nodeId,
+        prevOwner: prevOwner,
+        newOwner: newOwner,
+        captured_at: timestamp,
+        points: points});
+
+    await ce.save(function (err, ce) {
+        if (err) return res.json(err);
+    });
+    points = node.getValue(node.secondsSinceCapture(timestamp));
     NodeSchema.findByIdAndUpdate(req.body.nodeId,
                                 { $set: { owner: newOwner._id,
                                           captured_at: timestamp }},{ new: true })
