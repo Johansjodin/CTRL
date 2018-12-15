@@ -30,7 +30,8 @@ var UserSchema = new mongoose.Schema({
     },
     admin: { type: Boolean, default: false },
     googleId: {type: String, unique: true, required: [true, "google id required"]},
-    points: { type: Number, default: 0}
+    points: { type: Number, default: 0},
+    cardId: {type: String, unique: true}
 }, {timestamps: true});
 
 UserSchema.plugin(uniqueValidator, {message: 'is already taken.'});

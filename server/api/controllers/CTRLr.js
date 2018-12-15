@@ -104,6 +104,27 @@ exports.set_image = function(req, res) {
     });
 }
 
+exports.set_card = function(req, res) {
+    if (req.user._id !== req.params.userId) {
+        return res.status(401).json("Not authorized.").end();
+    }
+    let query = User.findById(req.params.userId);
+    query.exec(function (err, user) {
+
+        if (err) return res.json(err);
+        if (!user) return res.status(404).end();
+
+        if (!req.body.cardId) return res.status(400).json("please give cardId").end();
+
+        user.cardId = req.body.cardId;
+        user.save(function (err, user) {
+
+            if (err) return res.json(err);
+            res.json(user.cardId);
+        });
+    });
+}
+
 /* with multi form data
 exports.set_image = function(req, res) {
     if (req.user._id !== req.params.userId) {
@@ -226,16 +247,23 @@ exports.test_capture = function(req, res) {
     let timestamp = new Date();
     let points;
     let ce;
+    let newOwner;
     NodeSchema.findById(req.body.nodeId)
     .exec(function (err, node) {
         if (err) return res.json(err);
         if (!node) return res.status(404).end();
 
         prevOwner = node.owner;
+        User.findOne({cardId: req.body.cardId})
+        .exec(function (err, user) {
+            if (err) return res.json(err);
+            if (!user) return res.status(404).end();
+            newOwner = user;
+        });
         points = node.getValue(node.secondsSinceCapture(timestamp));
         ce = new CaptureEvent({ node: req.body.nodeId,
                                     prevOwner: prevOwner,
-                                    newOwner: req.body.newowner,
+                                    newOwner: newOwner,
                                     captured_at: timestamp,
                                     points: points});
         ce.save(function (err, ce) {
@@ -249,7 +277,7 @@ exports.test_capture = function(req, res) {
      * for some reason save doesnt work so gotta do this
      */
     NodeSchema.findByIdAndUpdate(req.body.nodeId,
-                                { $set: { owner: req.body.newowner,
+                                { $set: { owner: newOwner._id,
                                           captured_at: timestamp }},{ new: true })
     .populate({ path: 'owner', select: '-salt -hash -admin -updatedAt'})
     .exec(function (err, node) {
@@ -259,15 +287,11 @@ exports.test_capture = function(req, res) {
         if (err) return res.json(err);
         if (!node) return res.status(404).end();
 
-        User.findById(req.body.newowner).exec(function (err, user) {
-            if (err) return res.json(err);
-            if (!user) return res.status(404).end();
-            sse.send(ce, 'capture');
-            node.capture(req.body.newowner, timestamp);
-            user.givePoints(points);
-            user.save();
-            res.json(user.colors);
-        });
+        sse.send(ce, 'capture');
+        node.capture(newowner._id, timestamp);
+        user.givePoints(points);
+        user.save();
+        res.json(user.colors);
     });
 };
 

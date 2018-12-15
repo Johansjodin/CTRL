@@ -25,6 +25,9 @@ module.exports = function(app) {
     app.route('/users/:userId/image')
         .post(auth.loginRequired, upload.single('avatar'), ctrl.set_image)
 
+    app.route('/users/:userId/card')
+        .post(auth.loginRequired, ctrl.set_card)
+
     app.route('/images/:filename')
         .get(ctrl.get_image)
 
