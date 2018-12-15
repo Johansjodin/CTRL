@@ -243,23 +243,23 @@ exports.test_event = function(req, res) {
 };
 
 exports.test_capture = async function(req, res) {
-    let prevOwner;
     let timestamp = new Date();
-    let node = await NodeSchema.findById(req.body.nodeId)
-    .exec(function (err, node) {
-        if (err) return res.json(err);
-        if (!node) return res.status(404).end();
+    let node;
+    try {
+        node = await NodeSchema.findById(req.body.nodeId);
+    } catch (e) {}
 
-        prevOwner = node.owner;
-        return node;
-    });
-    let newOwner = await User.findOne({cardId: req.body.cardId})
-    .exec(function (err, user) {
-        if (err) return res.json(err);
-        if (!user) return res.status(404).end();
-        return user;
-    });
+    if (!node) return res.status(404).end();
 
+    let prevOwner = node.owner;
+    let newOwner;
+    try {
+        newOwner = await User.findOne({cardId: req.body.cardId});
+    } catch (e) {}
+
+    if (!newOwner) return res.status(404).end();
+
+    let points = node.getValue(node.secondsSinceCapture(timestamp));
     let ce = new CaptureEvent({ node: req.body.nodeId,
         prevOwner: prevOwner,
         newOwner: newOwner,
@@ -267,9 +267,9 @@ exports.test_capture = async function(req, res) {
         points: points});
 
     await ce.save(function (err, ce) {
-        if (err) return res.json(err);
+        //if (err) return res.json(err);
     });
-    let points = node.getValue(node.secondsSinceCapture(timestamp));
+
     NodeSchema.findByIdAndUpdate(req.body.nodeId,
                                 { $set: { owner: newOwner._id,
                                           captured_at: timestamp }},{ new: true })
@@ -282,10 +282,10 @@ exports.test_capture = async function(req, res) {
         if (!node) return res.status(404).end();
 
         sse.send(ce, 'capture');
-        node.capture(newowner._id, timestamp);
-        user.givePoints(points);
-        user.save();
-        res.json(user.colors);
+        node.capture(newOwner._id, timestamp);
+        newOwner.givePoints(points);
+        newOwner.save();
+        res.json(newOwner.colors);
     });
 };
 
