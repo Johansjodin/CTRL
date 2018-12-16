@@ -4,10 +4,11 @@ import MapView, { PROVIDER_GOOGLE } from 'react-native-maps';
 import Navbar from '../components/navbar';
 import NodeInfo from '../components/nodeInfo';
 import { getNodes, getColor, getUser } from '../api/api';
-import { SecureStore } from 'expo';
+//import { SecureStore } from 'expo';
+import { AsyncStorage } from "react-native";
 import { store } from '../components/store'
 
-export default class LoginScreen extends React.Component {
+export default class MapScreen extends React.Component {
 
     constructor(props) {
         super(props);
@@ -42,7 +43,10 @@ export default class LoginScreen extends React.Component {
     async nodeClick(node) {
         let response;
         try{
-            let token = await SecureStore.getItemAsync('jwt');
+            //let token = await SecureStore.getItemAsync('jwt');
+            let token = await AsyncStorage.getItem('jwt');
+            console.log("nodeClick");
+            console.log(token);
             response = await getColor(store.uid, token);    // TODO: change getColor to get node.owner's colors
         } catch (e) {
             console.log('mapScreen.js::nodeClick::Error retrieving node info.');
@@ -66,6 +70,7 @@ export default class LoginScreen extends React.Component {
 
     async componentDidMount() {
         let nodes = await getNodes();
+        console.log(nodes);
         let convertedNodes = nodes.map(async node => {
             let username = (await getUser(node.owner)).username;
             return {

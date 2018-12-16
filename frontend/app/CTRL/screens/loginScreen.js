@@ -1,9 +1,8 @@
 import React from 'react';
 import { StyleSheet, View, Image, StatusBar } from 'react-native';
 import { RoundedButton } from '../components/roundedButton';
-import { EmergencyBar } from '../components/EmergencyBar';
+import EmergencyBar from '../components/EmergencyBar';
 import { signIn, signInWithGoogleAsync } from '../api/api';
-import { SecureStore } from "expo";
 
 export default class LoginScreen extends React.Component {
 
@@ -24,11 +23,12 @@ export default class LoginScreen extends React.Component {
             return;
 
         if (result.error) {
+            console.log("error signing in");
             this.setState({showError:true, errorMessage: 'Sign up with Google failed. Do try again.'});
             return;
         }
-            
-        await signIn(result); // idToken
+
+        await signIn(result.idToken, result.user.id); // idToken
         this.props.navigation.navigate('MapScreen');
     }
 
@@ -43,8 +43,8 @@ export default class LoginScreen extends React.Component {
             return;
         }
 
-        await signIn(result); // idToken
-        this.props.navigation.navigate('RegisterScreen', {idToken: result});
+        //await signIn(result.idToken, result.user.id); // idToken
+        this.props.navigation.navigate('RegisterScreen', {idToken: result.idToken, userId: result.user.id});
     }
 
 	render() {

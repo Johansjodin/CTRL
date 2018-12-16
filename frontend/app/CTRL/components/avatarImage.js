@@ -2,7 +2,8 @@ import React from 'react';
 import Dialog, {DialogContent} from "react-native-popup-dialog/src";
 import { store } from "./store";
 import { setImage } from "../api/api";
-import { SecureStore } from 'expo';
+//import { SecureStore } from 'expo';
+import { AsyncStorage } from "react-native";
 import {Avatar} from "react-native-elements";
 import { StyleSheet, TouchableOpacity } from "react-native";
 const pictureLib = ['https://s3.amazonaws.com/uifaces/faces/twitter/adhamdannaway/128.jpg', 'https://deltro.jp/images/img_freeface00.jpg', 'https://www.maybelline.co.nz/~/media/Images/MNY/en_US/Home/Products/Face/Foundation/Fit-Me-Shine-Free-Foundation/fit-me-stick_model-shot.jpg','https://static.turbosquid.com/Preview/000153/503/D9/free-asian-female-face-3d-model_D.jpg'];
@@ -26,7 +27,9 @@ export class AvatarImage extends React.Component{
         this.forceUpdate();
     }
     async closePicturesDialog(){
-        let tokenId = await SecureStore.getItemAsync('jwt');
+        await AsyncStorage.getItem('jwt');
+        let tokenId = await AsyncStorage.getItem('jwt');
+        //let tokenId = await SecureStore.getItemAsync('jwt');
         await setImage(store.uid, tokenId, store.pic);
         await this.setState({visible:false});
     }

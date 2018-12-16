@@ -3,6 +3,8 @@ import { Keyboard, StyleSheet, View, SafeAreaView, TouchableWithoutFeedback, Ani
 import { FormInput } from 'react-native-elements';
 import { RoundedButton } from '../components/roundedButton';
 import {signUp} from '../api/api';
+import { store } from '../components/store';
+import { AsyncStorage } from "react-native";
 
 export default class RegisterScreen extends React.Component {
 
@@ -21,6 +23,7 @@ export default class RegisterScreen extends React.Component {
     componentDidMount() {
 
         this.tokenId = this.props.navigation.getParam('idToken', null)
+        this.userId = this.props.navigation.getParam('userId', null)
 
         Animated.timing(
             this.state.headingDelay, 
@@ -42,12 +45,10 @@ export default class RegisterScreen extends React.Component {
 
 	async handleSubmit(e) {
         try {
-            await signUp(this.tokenId, this.state.username);
-            // SAVE TO FILE or something
+            await signUp(this.tokenId, this.state.username, this.userId);
             this.props.navigation.navigate('MapScreen');
-
         } catch (err) {
-            console.log("registerscreen.js::Error signing in:"+err.message)
+            console.log("registerscreen.js::Error signing up:"+err.message)
             return; // TODO show something
         }
 	}

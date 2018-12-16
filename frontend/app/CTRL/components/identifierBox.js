@@ -5,7 +5,8 @@ import Dialog, {DialogContent} from "react-native-popup-dialog/src";
 import { ColorPicker, TriangleColorPicker, fromHsv, toHsv} from "react-native-color-picker";
 import { store } from "./store";
 import { setColor } from "../api/api";
-import { SecureStore } from 'expo';
+//import { SecureStore } from 'expo';
+import { AsyncStorage } from "react-native";
 
 export class IdentifierBox extends React.Component{
     constructor(props){
@@ -25,7 +26,8 @@ export class IdentifierBox extends React.Component{
         this.forceUpdate();
     }
     async closeColorDialog(){
-        let tokenId = await SecureStore.getItemAsync('jwt');
+        let tokenId = await AsyncStorage.getItem('jwt');
+        //let tokenId = await SecureStore.getItemAsync('jwt');
         await setColor(store.uid, tokenId, store.colors);
         this.setState({visible:false})
     }

@@ -8,9 +8,12 @@ import { ZoneList } from '../components/zoneList';
 import { IdentifierBox } from '../components/identifierBox';
 import { store } from '../components/store';
 import { getNodesBy, getUser, setImage, getLeaderboard } from '../api/api'
-import { SecureStore } from 'expo'
+//import { SecureStore } from 'expo'
+import { AsyncStorage } from "react-native";
 import {IconButton} from "../components/iconButton";
 import {AvatarImage} from "../components/avatarImage";
+import { GoogleSignin } from 'react-native-google-signin';
+
 const spacerSize = 1000;
 const pictureLib = ['https://s3.amazonaws.com/uifaces/faces/twitter/adhamdannaway/128.jpg', 'https://deltro.jp/images/img_freeface00.jpg', 'https://www.maybelline.co.nz/~/media/Images/MNY/en_US/Home/Products/Face/Foundation/Fit-Me-Shine-Free-Foundation/fit-me-stick_model-shot.jpg','https://static.turbosquid.com/Preview/000153/503/D9/free-asian-female-face-3d-model_D.jpg'];
 
@@ -31,6 +34,7 @@ export default class ProfileScreen extends React.Component {
             nodes: [],
             leaderboard:[],
             identifier: store.colors, //['#c62828', '#6a1b9a', '#283593', '#0277bd', '#00695c'],
+            cardId: null,
         },
         this.handleSignOut = this.handleSignOut.bind(this);
     }
@@ -53,31 +57,51 @@ export default class ProfileScreen extends React.Component {
     }
 
     async updateUserInfo(){
+        let cardId = await AsyncStorage.getItem('cardId');
+
         let myNodes = await getNodesBy(store.uid);
         let userInfo = await getUser(store.uid);
+        store.rank = ''; // TODO fix
+
+        let i;
+        for (i = 0; i < store.leaderboard.length; i++) {
+            if (store.leaderboard[i]._id === store.uid) {
+                store.rank = i+1;
+            }
+        }
+
+        console.log("rank: ", store.rank);
 
         store.myNodes = myNodes;
-        store.rank = -1; // TODO fix
         store.points = userInfo.points;
+
         
         this.setState({
             stats: {
                 current: myNodes.length, 
                 points: userInfo.points, 
-                rank: -1, // TODO FIX
+                rank: store.rank, // TODO FIX
             }, 
             nodes: myNodes,
+            cardId: cardId,
         });
     }
 
     async componentDidMount() {
-        await this.updateUserInfo();
         store.leaderboard = await getLeaderboard();
+        await this.updateUserInfo();
     }
 
-    handleSignOut(){
-        SecureStore.deleteItemAsync('jwt');
-        SecureStore.deleteItemAsync('uid');
+    async handleSignOut(){
+        await AsyncStorage.removeItem('jwt'); // TODO error handling
+        await AsyncStorage.removeItem('uid');
+        try {
+            await GoogleSignin.revokeAccess();
+            await GoogleSignin.signOut();
+            this.setState({ user: null }); // Remember to remove the user from your app's state as well
+        } catch (error) {
+            console.error(error);
+        }
         this.props.navigation.navigate('LoginScreen');
     }
 	render() {
@@ -89,15 +113,6 @@ export default class ProfileScreen extends React.Component {
                         <View style={styles.header}>
                             <AvatarImage isEditing={this.state.isEditing}/>
                             <Text style={styles.username}>{this.state.username.toUpperCase()}</Text>
-                            <View style={{flex:0, flexShrink:1, flexDirection: 'row', alignSelf:'flex-end'}}>
-                                {this.state.isEditing ? <Text style={styles.editingProfile}>Editing profile</Text> : null}
-                                <IconButton
-                                    icon={'edit'}
-                                    width={20}
-                                    onPress={() => {this.setState({isEditing:!this.state.isEditing})}}
-                                    style={{marginTop: 0}}
-                                />
-                            </View>
                         </View>
                         
                         <View style={[styles.content, this.state.isEditing ? {backgroundColor:'#2c532b'} : null]}>
@@ -105,12 +120,17 @@ export default class ProfileScreen extends React.Component {
                             <View style={styles.paddedContent}>
                                 <View style={{height: 1, width: '100%', backgroundColor: 'black', marginBottom: 25}}></View>
                                 <IdentifierBox colors={this.state.identifier} containercolor={'transparent'} isEditing={this.state.isEditing}/>
+
                                 <Text style={[styles.zoneListLabel, {marginTop: 25}]}>Controlled zones</Text>
                                 <ZoneList zones={this.state.nodes.map(node => {return node.name})} />
-
-                                <Text style={styles.zoneListLabel}>Previously controlled zones</Text>
-                                <ZoneList zones={this.state.nodes.map(node => {return node.name})} />
-
+                                
+                                <RoundedButton
+                                    backgroundColor='#23A6D5'
+                                    title={this.state.isEditing ? 'Save' : 'Edit profile'} 
+                                    width={100}
+                                    onPress={() => {this.setState({isEditing:!this.state.isEditing})}}
+                                    style={{marginTop: 35}}
+                                />
                                 <RoundedButton
                                     backgroundColor='#ff5555'
                                     title='Log out' 
@@ -152,7 +172,7 @@ const styles = StyleSheet.create({
     header: {
         flex: 1,
         paddingTop: 30,
-        paddingBottom: 0,   // prev: 35
+        paddingBottom: 35,   // prev: 35
         backgroundColor: 'white',
         alignItems: 'center',
         width: '100%',

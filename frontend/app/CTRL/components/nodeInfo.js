@@ -17,7 +17,7 @@ export default class nodeInfo extends React.Component {
                 <View style={styles.nodeInfo}>
                     <View style={styles.header}>
                         <Text style={styles.nodeName}>{this.props.nodeInfo.title.toUpperCase()}</Text>
-                        <Text style={styles.value}>300</Text>
+                        <Text style={styles.value}>{parseInt((new Date() - new Date(this.props.nodeInfo.captured_at)) / 1000 )}</Text>
                     </View>
                     
                     <Text style={{fontSize: 18}}>Owner: {this.props.nodeInfo.ownerName}</Text>

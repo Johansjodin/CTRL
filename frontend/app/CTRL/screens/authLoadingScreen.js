@@ -1,15 +1,21 @@
 import React from 'react';
 import { StyleSheet, View, StatusBar } from 'react-native';
-import {SecureStore} from "expo";
+//import {SecureStore} from "expo";
+import { AsyncStorage } from "react-native";
 import { getUser, getNodes } from '../api/api';
 import { store } from '../components/store';
-
+import { GoogleSignin } from 'react-native-google-signin';
 
 export default class AuthLoadingScreen extends React.Component {
 
     constructor(props) {
         super(props);
 
+        GoogleSignin.configure({
+            scopes: ['profile'], // what API you want to access on behalf of the user, default is email and profile
+            webClientId: '599513397770-3586oft2o4btq75s695tvsl7p3r7dcmk.apps.googleusercontent.com',
+            forceConsentPrompt: true,
+        });
         this.verifyToken();
     }
 
@@ -19,8 +25,10 @@ export default class AuthLoadingScreen extends React.Component {
 
     async verifyToken() {
         try{
-            const token = await SecureStore.getItemAsync('jwt');
-            const uid = await SecureStore.getItemAsync('uid');
+            let token = await AsyncStorage.getItem('jwt');
+            let uid = await AsyncStorage.getItem('uid');
+            //const token = await SecureStore.getItemAsync('jwt');
+            //const uid = await SecureStore.getItemAsync('uid');
             if (token && uid) {
                 let userInfo = await getUser(uid);
                 store.username = userInfo.username; // TODO lite annorlunda mot andra apierna, ändra när det läggs in i store?
