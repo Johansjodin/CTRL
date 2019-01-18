@@ -1,15 +1,62 @@
 'use strict';
+var multer  = require('multer');
+var util = require('../util');
+var upload = multer({ dest: 'uploads/', fileFilter: util.imageFilter});
+
 module.exports = function(app) {
-    var ctrl = require('../controllers/CTRLr');
+    const ctrl = require('../controllers/CTRLr');
+    const auth = require('../controllers/auth');
+
+    app.use(auth.validateToken);
 
     app.route('/users')
         .post(ctrl.create_user);
 
+    app.route('/leaderboards')
+        .get(ctrl.get_leaderboard);
+
     app.route('/users/:userId')
         .get(ctrl.get_user);
-/*
-    app.route('/session/')
-        .post(ctrl.auth_user)
-        .delete(ctrl.destroy_session); */
+
+    app.route('/users/:userId/colors')
+        .post(auth.loginRequired, ctrl.set_colors)
+        .get(ctrl.get_user_colors)
+
+    app.route('/users/:userId/image')
+        .post(auth.loginRequired, upload.single('avatar'), ctrl.set_image)
+
+    app.route('/users/:userId/card')
+        .post(auth.loginRequired, ctrl.set_card)
+
+    app.route('/images/:filename')
+        .get(ctrl.get_image)
+
+    app.route('/nodes/')
+        .get(ctrl.get_nodes)
+        .post(auth.loginRequired, auth.adminRequired, ctrl.create_node);
+
+    app.route('/nodes/:userId')
+        .get(ctrl.get_nodes_owned_by_user)
+
+    app.route('/events/node/:nodeId')
+        .get(ctrl.get_capture_events_by_node)
+
+    app.route('/events/user/:userId')
+        .get(ctrl.get_capture_events_by_user)
+
+    app.route('/stream')
+        .get(ctrl.stream_events);
+
+    app.route('/testevent')
+        .get(ctrl.test_event);
+
+    app.route('/capture')
+        .post(ctrl.test_capture);
+
+    app.route('/auth/sign_up')
+        .post(auth.googleAuth, ctrl.create_user)
+
+    app.route('/auth/sign_in')
+        .post(auth.googleAuth, ctrl.login);
 
 };
